@@ -1,0 +1,4 @@
+enableFeaturePreview("VERSION_CATALOGS")
+rootProject.name = "PetFinderApp"
+include ':app'
+include ':logging'
