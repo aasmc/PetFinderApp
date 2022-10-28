@@ -5,7 +5,7 @@ data class Media(
     val videos: List<Video>
 ) {
     companion object {
-        private const val EMPTY_MEDIA = ""
+        const val EMPTY_MEDIA = ""
     }
 
     fun getFirstSmallestAvailablePhoto(): String =
@@ -20,7 +20,7 @@ data class Media(
         val full: String
     ) {
         companion object {
-            private const val EMPTY_PHOTO = ""
+            const val EMPTY_PHOTO = ""
         }
 
         fun getSmallestAvailablePhoto(): String = when {
@@ -30,7 +30,7 @@ data class Media(
         }
 
         private fun isValidPhoto(photo: String): Boolean {
-            return photo.isEmpty()
+            return photo.isNotEmpty()
         }
     }
 
