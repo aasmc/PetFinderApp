@@ -55,6 +55,12 @@ android {
     buildFeatures {
         viewBinding true
     }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -69,8 +75,14 @@ dependencies {
 
     // Testing Dependencies
     testImplementation "junit:junit:$junit_version"
+    testImplementation "com.google.truth:truth:$google_truth_version"
+    testImplementation "org.mockito:mockito-core:$mockito_version"
+    testImplementation "org.robolectric:robolectric:$robolectric_version"
+    androidTestImplementation "com.google.truth:truth:$google_truth_version"
     androidTestImplementation "androidx.test.ext:junit:$androidx_junit_version"
     androidTestImplementation "androidx.test.espresso:espresso-core:$espresso_version"
+    androidTestImplementation "androidx.arch.core:core-testing:$androidx_core_testing_version"
+
 
     // TUTORIAL DEPENDENCIES HERE
 
@@ -84,6 +96,9 @@ dependencies {
     implementation "com.squareup.okhttp3:logging-interceptor:$okHttp_version"
     implementation "com.squareup.moshi:moshi-kotlin:$moshi_version"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshi_version"
+
+    testImplementation("com.squareup.okhttp3:mockwebserver:$mockwebserver_version")
+    androidTestImplementation("com.squareup.okhttp3:mockwebserver:$mockwebserver_version")
 
     // Cache
     implementation "androidx.room:room-runtime:$room_version"
@@ -102,6 +117,9 @@ dependencies {
     // DI
     implementation "com.google.dagger:hilt-android:$hilt_version"
     kapt "com.google.dagger:hilt-android-compiler:$hilt_version"
+
+    androidTestImplementation "com.google.dagger:hilt-android-testing:$hilt_version"
+    kaptAndroidTest "com.google.dagger:hilt-android-compiler:$hilt_version"
 
     // UI
     implementation "com.github.bumptech.glide:glide:$glide_version"
