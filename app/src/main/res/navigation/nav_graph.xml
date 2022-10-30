@@ -11,4 +11,10 @@
         android:label="@string/animals_near_you_screen_label"
         tools:layout="@layout/fragment_animals_near_you" />
 
+    <fragment
+        android:id="@+id/search"
+        android:name="ru.aasmc.petfinderapp.search.presentation.SearchFragment"
+        android:label="@string/search_screen_label"
+        tools:layout="@layout/fragment_search" />
+
 </navigation>

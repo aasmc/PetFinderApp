@@ -1,12 +1,14 @@
 package ru.aasmc.petfinderapp.common.data
 
 import io.reactivex.Flowable
+import retrofit2.HttpException
 import ru.aasmc.petfinderapp.common.data.api.PetFinderApi
 import ru.aasmc.petfinderapp.common.data.api.model.mappers.ApiAnimalMapper
 import ru.aasmc.petfinderapp.common.data.api.model.mappers.ApiPaginationMapper
 import ru.aasmc.petfinderapp.common.data.cache.Cache
 import ru.aasmc.petfinderapp.common.data.cache.model.cachedanimal.CachedAnimalAggregate
 import ru.aasmc.petfinderapp.common.data.cache.model.cachedorganization.CachedOrganization
+import ru.aasmc.petfinderapp.common.domain.model.NetworkException
 import ru.aasmc.petfinderapp.common.domain.model.animal.Animal
 import ru.aasmc.petfinderapp.common.domain.model.animal.details.AnimalWithDetails
 import ru.aasmc.petfinderapp.common.domain.model.pagination.PaginatedAnimals
@@ -44,17 +46,21 @@ class PetFinderAnimalRepository @Inject constructor(
         pageToLoad: Int,
         numberOfItems: Int
     ): PaginatedAnimals {
-        val (apiAnimals, apiPagination) = api.getNearbyAnimals(
-            pageToLoad,
-            numberOfItems,
-            postcode,
-            maxDistanceMiles
-        )
+        try {
+            val (apiAnimals, apiPagination) = api.getNearbyAnimals(
+                pageToLoad,
+                numberOfItems,
+                postcode,
+                maxDistanceMiles
+            )
 
-        return PaginatedAnimals(
-            apiAnimals?.map { apiAnimalMapper.mapToDomain(it) }.orEmpty(),
-            apiPaginationMapper.mapToDomain(apiPagination)
-        )
+            return PaginatedAnimals(
+                apiAnimals?.map { apiAnimalMapper.mapToDomain(it) }.orEmpty(),
+                apiPaginationMapper.mapToDomain(apiPagination)
+            )
+        } catch (e: HttpException) {
+            throw NetworkException(e.message ?: "Code ${e.code()}")
+        }
     }
 
     override suspend fun storeAnimals(animals: List<AnimalWithDetails>) {
