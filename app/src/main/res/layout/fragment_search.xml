@@ -26,6 +26,7 @@
           app:layout_scrollFlags="snap|scroll|enterAlways">
 
         <include
+            android:id="@+id/search_widget"
             layout="@layout/filtered_search_widget"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

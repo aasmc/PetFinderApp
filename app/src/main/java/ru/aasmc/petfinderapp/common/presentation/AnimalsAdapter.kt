@@ -31,7 +31,6 @@ class AnimalsAdapter
             binding.name.text = item.name
             binding.photo.setImage(item.photo)
         }
-
     }
 }
 
@@ -41,6 +40,6 @@ private val ITEM_COMPARATOR = object : DiffUtil.ItemCallback<UIAnimal>() {
     }
 
     override fun areContentsTheSame(oldItem: UIAnimal, newItem: UIAnimal): Boolean {
-        return oldItem.name == newItem.name && oldItem.photo == newItem.photo
+        return oldItem == newItem
     }
 }
