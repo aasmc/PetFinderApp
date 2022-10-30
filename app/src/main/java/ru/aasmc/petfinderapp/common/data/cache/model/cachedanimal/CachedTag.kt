@@ -5,6 +5,6 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "tags")
 data class CachedTag(
-    @PrimaryKey(autoGenerate = false)
+    @PrimaryKey
     val tag: String
 )
