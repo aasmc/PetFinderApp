@@ -28,7 +28,7 @@
       app:layout_constraintTop_toBottomOf="@id/search">
 
     <AutoCompleteTextView
-        android:id="@+id/type_dropdown"
+        android:id="@+id/type"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/animal_type_dropdown_menu_hint"
@@ -50,7 +50,7 @@
       app:layout_constraintTop_toBottomOf="@+id/search">
 
     <AutoCompleteTextView
-        android:id="@+id/age_dropdown"
+        android:id="@+id/age"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/age_dropdown_menu_hint"
