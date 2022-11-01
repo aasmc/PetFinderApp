@@ -22,4 +22,15 @@ class RoomCache @Inject constructor(
     override fun storeOrganizations(organizations: List<CachedOrganization>) {
         organizationsDao.insert(organizations)
     }
+
+    override suspend fun getAllTypes(): List<String> =
+        animalsDao.getAllTypes()
+
+    override fun searchAnimalsBy(
+        name: String,
+        age: String,
+        type: String
+    ): Flowable<List<CachedAnimalAggregate>> {
+        return animalsDao.searchAnimalsBy(name, age, type)
+    }
 }

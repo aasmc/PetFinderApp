@@ -37,7 +37,10 @@ import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltAndroidTest
-@UninstallModules(PreferencesModule::class, CacheModule::class)
+@UninstallModules(
+    PreferencesModule::class,
+    CacheModule::class
+)
 class PetFinderAnimalRepositoryTest {
     private val fakeServer = FakeServer()
     private lateinit var repository: AnimalRepository
@@ -64,20 +67,6 @@ class PetFinderAnimalRepositoryTest {
 
     @BindValue
     val preferences: Preferences = FakePreferences()
-
-    @Module
-    @InstallIn(SingletonComponent::class)
-    object TestCacheModule {
-        @Provides
-        fun provideRoomDatabase(): PetSaveDatabase {
-            return Room.inMemoryDatabaseBuilder(
-                InstrumentationRegistry.getInstrumentation().context,
-                PetSaveDatabase::class.java
-            )
-                .allowMainThreadQueries()
-                .build()
-        }
-    }
 
     @Before
     fun setup() {
