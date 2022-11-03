@@ -2,6 +2,7 @@ package ru.aasmc.petfinderapp.search.presentation
 
 import ru.aasmc.petfinderapp.common.presentation.Event
 import ru.aasmc.petfinderapp.common.presentation.model.UIAnimal
+import java.util.*
 
 data class SearchViewState(
     val noSearchQuery: Boolean = true,

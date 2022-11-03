@@ -27,14 +27,15 @@ import java.time.Instant
  */
 @RunWith(RobolectricTestRunner::class)
 class AuthenticationInterceptorTest {
+
     private lateinit var preferences: Preferences
     private lateinit var mockWebServer: MockWebServer
     private lateinit var authenticationInterceptor: AuthenticationInterceptor
     private lateinit var okHttpClient: OkHttpClient
 
-    private val endPointSeparator = "/"
-    private val animalsEndPointPath = endPointSeparator + ApiConstants.ANIMALS_ENDPOINT
-    private val authEndpointPath = endPointSeparator + ApiConstants.AUTH_ENDPOINT
+    private val endpointSeparator = "/"
+    private val animalsEndpointPath = endpointSeparator + ApiConstants.ANIMALS_ENDPOINT
+    private val authEndpointPath = endpointSeparator + ApiConstants.AUTH_ENDPOINT
     private val validToken = "validToken"
     private val expiredToken = "expiredToken"
 
@@ -46,10 +47,7 @@ class AuthenticationInterceptorTest {
         mockWebServer.start(8080)
 
         authenticationInterceptor = AuthenticationInterceptor(preferences)
-        okHttpClient = OkHttpClient()
-            .newBuilder()
-            .addInterceptor(authenticationInterceptor)
-            .build()
+        okHttpClient = OkHttpClient().newBuilder().addInterceptor(authenticationInterceptor).build()
     }
 
     @After
@@ -59,33 +57,31 @@ class AuthenticationInterceptorTest {
 
     @Test
     fun authenticationInterceptor_validToken() {
-        // Given
+        //Given
         `when`(preferences.getToken()).thenReturn(validToken)
         `when`(preferences.getTokenExpirationTime()).thenReturn(
             Instant.now().plusSeconds(3600).epochSecond
         )
-        mockWebServer.dispatcher = getDispatcherForValidToken()
-        // When
 
+        mockWebServer.dispatcher = getDispatcherForValidToken()
+
+        // When
         okHttpClient.newCall(
-            Request.Builder()
-                .url(mockWebServer.url(ApiConstants.ANIMALS_ENDPOINT))
-                .build()
+            Request.Builder().url(mockWebServer.url(ApiConstants.ANIMALS_ENDPOINT)).build()
         ).execute()
+
         // Then
-        // awaits the next HTTP request. This is a blocking method, so if anything goes wrong
-        // and the request never executes, the code will hang here until it times out
         val request = mockWebServer.takeRequest()
+
         with(request) {
             Truth.assertThat(method).isEqualTo("GET")
-            Truth.assertThat(path).isEqualTo(animalsEndPointPath)
-            Truth.assertThat(getHeader(ApiParameters.AUTH_HEADER))
-                .isEqualTo(ApiParameters.TOKEN_TYPE + validToken)
+            Truth.assertThat(path).isEqualTo(animalsEndpointPath)
+            Truth.assertThat(getHeader(ApiParameters.AUTH_HEADER)).isEqualTo(ApiParameters.TOKEN_TYPE + validToken)
         }
     }
 
     @Test
-    fun authenticationInterceptor_expiredToken() {
+    fun authenticatorInterceptor_expiredToken() {
         // Given
         `when`(preferences.getToken()).thenReturn(expiredToken)
         `when`(preferences.getTokenExpirationTime()).thenReturn(
@@ -93,12 +89,12 @@ class AuthenticationInterceptorTest {
         )
 
         mockWebServer.dispatcher = getDispatcherForExpiredToken()
+
         // When
         okHttpClient.newCall(
-            Request.Builder()
-                .url(mockWebServer.url(ApiConstants.ANIMALS_ENDPOINT))
-                .build()
+            Request.Builder().url(mockWebServer.url(ApiConstants.ANIMALS_ENDPOINT)).build()
         ).execute()
+
         // Then
         val tokenRequest = mockWebServer.takeRequest()
         val animalsRequest = mockWebServer.takeRequest()
@@ -107,42 +103,31 @@ class AuthenticationInterceptorTest {
             Truth.assertThat(method).isEqualTo("POST")
             Truth.assertThat(path).isEqualTo(authEndpointPath)
         }
-        // verify that preferences.getToken() is called before
-        // preferences.putToken()
+
         val inOrder = inOrder(preferences)
+
         inOrder.verify(preferences).getToken()
         inOrder.verify(preferences).putToken(validToken)
+
         verify(preferences, times(1)).getToken()
         verify(preferences, times(1)).putToken(validToken)
         verify(preferences, times(1)).getTokenExpirationTime()
-        verify(preferences, times(1))
-            .putTokenExpirationTime(anyLong())
+        verify(preferences, times(1)).putTokenExpirationTime(anyLong())
         verify(preferences, times(1)).putTokenType(ApiParameters.TOKEN_TYPE.trim())
         verifyNoMoreInteractions(preferences)
 
         with(animalsRequest) {
             Truth.assertThat(method).isEqualTo("GET")
-            Truth.assertThat(path).isEqualTo(animalsEndPointPath)
-            Truth.assertThat(getHeader(ApiParameters.AUTH_HEADER))
-                .isEqualTo(ApiParameters.TOKEN_TYPE + validToken)
+            Truth.assertThat(path).isEqualTo(animalsEndpointPath)
+            Truth.assertThat(getHeader(ApiParameters.AUTH_HEADER)).isEqualTo(ApiParameters.TOKEN_TYPE + validToken)
         }
     }
 
-    /**
-     * MockWebServer can take a Dispatcher that specifies what to return for each
-     * request.
-     *
-     * This method creates a Dispatcher that returns a response code OK 200.
-     */
     private fun getDispatcherForValidToken() = object : Dispatcher() {
         override fun dispatch(request: RecordedRequest): MockResponse {
             return when (request.path) {
-                animalsEndPointPath -> {
-                    MockResponse().setResponseCode(200)
-                }
-                else -> {
-                    MockResponse().setResponseCode(404)
-                }
+                animalsEndpointPath -> { MockResponse().setResponseCode(200) }
+                else -> { MockResponse().setResponseCode(404) }
             }
         }
     }
@@ -151,12 +136,10 @@ class AuthenticationInterceptorTest {
         override fun dispatch(request: RecordedRequest): MockResponse {
             return when (request.path) {
                 authEndpointPath -> {
-                    MockResponse().setResponseCode(200)
-                        .setBody(JsonReader.getJson("common/src/debug/assets/networkresponses/validToken.json"))
+                    MockResponse().setResponseCode(200).setBody(JsonReader.getJson("validToken.json"))
                 }
-                else -> {
-                    MockResponse().setResponseCode(404)
-                }
+                animalsEndpointPath -> { MockResponse().setResponseCode(200) }
+                else -> { MockResponse().setResponseCode(404) }
             }
         }
     }

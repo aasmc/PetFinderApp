@@ -33,11 +33,11 @@ class SearchAnimals @Inject constructor(private val animalRepository: AnimalRepo
 
         val age = ageSubject.replaceUIEmptyValue().map {
             it.lowercase()
-                .replaceFirstChar { firstChar ->
-                    if (firstChar.isLowerCase()) {
-                        firstChar.titlecase(Locale.ROOT)
+                .replaceFirstChar { ch ->
+                    if (ch.isLowerCase()) {
+                        ch.titlecase(Locale.ROOT)
                     } else {
-                        firstChar.toString()
+                        ch.toString()
                     }
                 }
         }

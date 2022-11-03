@@ -2,6 +2,7 @@ package ru.aasmc.petfinderapp.search
 
 import com.google.common.truth.Truth.assertThat
 import io.reactivex.disposables.CompositeDisposable
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -51,6 +52,7 @@ class SearchFragmentViewModelTest {
         )
     }
 
+
     @Test
     fun `SearchFragmentViewModel remote search with success`() = runTest {
         // Given
@@ -75,7 +77,7 @@ class SearchFragmentViewModelTest {
         viewModel.onEvent(SearchEvent.TypeValueSelected(type))
         viewModel.onEvent(SearchEvent.AgeValueSelected(age))
         viewModel.onEvent(SearchEvent.QueryInput(name))
-
+        advanceUntilIdle()
         // Then
         val viewState = viewModel.state.value
 

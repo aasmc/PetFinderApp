@@ -149,7 +149,7 @@ class FakeRepository @Inject constructor() : AnimalRepository {
 
         val matches = mutableRemoteAnimals.filter {
             it.name == name &&
-                    (age.isEmpty() || it.details.age.name == age) &&
+                    (age.isEmpty() || it.details.age.name == age.uppercase()) &&
                     (type.isEmpty() || it.type == type)
         }
             .map { it.toAnimal() }
@@ -166,7 +166,7 @@ class FakeRepository @Inject constructor() : AnimalRepository {
         val (name, age, type) = searchParameters
 
         val matches = mutableRemoteAnimals.filter {
-            it.name == name && it.details.age.name == age && it.type == type
+            it.name == name && it.details.age.name == age.uppercase() && it.type == type
         }
 
         return PaginatedAnimals(
