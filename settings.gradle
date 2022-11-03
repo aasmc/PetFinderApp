@@ -2,3 +2,7 @@ enableFeaturePreview("VERSION_CATALOGS")
 rootProject.name = "PetFinderApp"
 include ':app'
 include ':logging'
+include ':common'
+include ':features:animalsnearyou'
+include ':features:search'
+

@@ -15,4 +15,5 @@ class PetSaveApplication : Application() {
     private fun initLogger() {
         Logger.init()
     }
+
 }

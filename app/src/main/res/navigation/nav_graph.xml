@@ -1,20 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+<navigation android:id="@+id/nav_graph"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/nav_graph"
-    app:startDestination="@id/animalsNearYou">
+    app:startDestination="@id/onboardingFragment">
+
+    <include app:graph="@navigation/nav_animalsnearyou" />
+    <include app:graph="@navigation/nav_search" />
 
     <fragment
-        android:id="@+id/animalsNearYou"
-        android:name="ru.aasmc.petfinderapp.animalsnearyou.presentation.AnimalsNearYouFragment"
-        android:label="@string/animals_near_you_screen_label"
-        tools:layout="@layout/fragment_animals_near_you" />
-
-    <fragment
-        android:id="@+id/search"
-        android:name="ru.aasmc.petfinderapp.search.presentation.SearchFragment"
-        android:label="@string/search_screen_label"
-        tools:layout="@layout/fragment_search" />
-
+        android:id="@+id/onboardingFragment"
+        android:name="ru.aasmc.petfinderapp.onboarding.presentation.OnboardingFragment"
+        android:label="@string/onboarding_screen_label"
+        tools:layout="@layout/fragment_onboarding" >
+        <action
+            android:id="@+id/action_onboardingFragment_to_animalsNearYou"
+            app:destination="@id/nav_animalsnearyou"
+            app:popUpTo="@id/onboardingFragment"
+            app:popUpToInclusive="true"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim" />
+    </fragment>
 </navigation>

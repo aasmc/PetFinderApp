@@ -3,8 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -20,7 +18,7 @@
 
         <!-- Main Activity -->
         <activity
-            android:name="ru.aasmc.petfinderapp.common.MainActivity"
+            android:name="ru.aasmc.petfinderapp.main.presentation.MainActivity"
             android:theme="@style/SplashTheme"
             android:exported="true">
             <intent-filter>
