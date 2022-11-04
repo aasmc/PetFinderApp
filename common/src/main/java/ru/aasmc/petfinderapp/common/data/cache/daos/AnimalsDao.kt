@@ -27,6 +27,10 @@ abstract class AnimalsDao {
     @Query("SELECT * FROM animals")
     abstract fun getAllAnimals(): Flowable<List<CachedAnimalAggregate>>
 
+    @Transaction
+    @Query("SELECT * FROM animals WHERE animalId IS :animalId")
+    abstract suspend fun getAnimal(animalId: Long): CachedAnimalAggregate
+
     /**
      * No need to add @Transaction here, because [Room] performs inserts in transaction.
      */

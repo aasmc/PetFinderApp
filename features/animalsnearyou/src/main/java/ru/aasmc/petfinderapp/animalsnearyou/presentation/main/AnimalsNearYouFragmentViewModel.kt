@@ -1,4 +1,4 @@
-package ru.aasmc.petfinderapp.animalsnearyou.presentation
+package ru.aasmc.petfinderapp.animalsnearyou.presentation.main
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

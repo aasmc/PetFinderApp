@@ -17,6 +17,8 @@ interface AnimalRepository {
 
     suspend fun getAnimalTypes(): List<String>
 
+    suspend fun getAnimal(animalId: Long): AnimalWithDetails
+
     fun getAnimalAges(): List<Age>
 
     fun searchCachedAnimalsBy(searchParameters: SearchParameters): Flowable<SearchResults>

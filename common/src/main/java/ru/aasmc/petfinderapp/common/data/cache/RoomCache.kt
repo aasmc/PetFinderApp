@@ -19,9 +19,15 @@ class RoomCache @Inject constructor(
         animalsDao.insertAnimalsWithDetails(animals)
     }
 
+    override suspend fun getAnimal(animalId: Long): CachedAnimalAggregate =
+        animalsDao.getAnimal(animalId)
+
     override suspend fun storeOrganizations(organizations: List<CachedOrganization>) {
         organizationsDao.insert(organizations)
     }
+
+    override suspend fun getOrganization(organizationId: String): CachedOrganization =
+        organizationsDao.getOrganization(organizationId)
 
     override suspend fun getAllTypes(): List<String> =
         animalsDao.getAllTypes()

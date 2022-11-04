@@ -6,4 +6,8 @@
   <dimen name="default_card_corner_radius">10dp</dimen>
   <dimen name="animals_near_you_image_height">160dp</dimen>
   <dimen name="small_margin">4dp</dimen>
+  <dimen name="large_margin">44dp</dimen>
+
+  <dimen name="extra_large_text">21sp</dimen>
+  <dimen name="small_text">14sp</dimen>
 </resources>

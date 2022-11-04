@@ -36,7 +36,10 @@ class PetFinderAnimalRepository @Inject constructor(
             }
     }
 
-    override suspend fun requestMoreAnimals(pageToLoad: Int, numberOfItems: Int): PaginatedAnimals {
+    override suspend fun requestMoreAnimals(
+        pageToLoad: Int,
+        numberOfItems: Int
+    ): PaginatedAnimals {
         val postcode = preferences.getPostcode()
         val maxDistanceMiles = preferences.getMaxDistanceAllowedToGetAnimals()
 
@@ -61,7 +64,8 @@ class PetFinderAnimalRepository @Inject constructor(
         // Organizations have a 1-to-many relation with animals, so we need to insert them first in
         // order for Room not to complain about foreign keys being invalid (since we have the
         // organizationId as a foreign key in the animals table)
-        val organizations = animals.map { CachedOrganization.fromDomain(it.details.organization) }
+        val organizations =
+            animals.map { CachedOrganization.fromDomain(it.details.organization) }
 
         cache.storeOrganizations(organizations)
         cache.storeNearbyAnimals(animals.map { CachedAnimalAggregate.fromDomain(it) })
@@ -69,6 +73,13 @@ class PetFinderAnimalRepository @Inject constructor(
 
     override suspend fun getAnimalTypes(): List<String> {
         return cache.getAllTypes()
+    }
+
+    override suspend fun getAnimal(animalId: Long): AnimalWithDetails {
+        val (animal, photos, videos, tags) =
+            cache.getAnimal(animalId)
+        val organization = cache.getOrganization(animal.organizationId)
+        return animal.toDomain(photos, videos, tags, organization)
     }
 
     override fun getAnimalAges(): List<Age> {
@@ -82,7 +93,7 @@ class PetFinderAnimalRepository @Inject constructor(
             .distinctUntilChanged().map { animalList ->
                 animalList.map { it.animal.toAnimalDomain(it.photos, it.videos, it.tags) }
             }
-            .map{ SearchResults(it, searchParameters) }
+            .map { SearchResults(it, searchParameters) }
     }
 
     override suspend fun searchAnimalsRemotely(
@@ -111,7 +122,7 @@ class PetFinderAnimalRepository @Inject constructor(
     }
 
     override suspend fun storeOnboardingData(postcode: String, distance: Int) {
-        with (preferences) {
+        with(preferences) {
             putPostcode(postcode)
             putMaxDistanceAllowedToGetAnimals(distance)
         }

@@ -35,3 +35,5 @@ inline fun CoroutineScope.createExceptionHandler(
         action(throwable)
     }
 }
+
+fun Boolean.toEnglish() = if (this) "Yes" else "No"

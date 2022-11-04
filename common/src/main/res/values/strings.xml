@@ -2,4 +2,5 @@
 <resources>
   <string name="photo_description">A picture of a dog near you</string>
   <string name="an_error_occurred">An error occurred. Please try again later.</string>
+  <string name="share">Share</string>
 </resources>
