@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_onboarding"
+    app:startDestination="@id/onboardingFragment">
+
+    <fragment
+        android:id="@+id/onboardingFragment"
+        android:name="ru.aasmc.petfinderapp.onboarding.presentation.OnboardingFragment"
+        android:label="@string/onboarding_screen_label"
+        tools:layout="@layout/fragment_onboarding">
+    </fragment>
+
+</navigation>
+
+    <!--We have a few options to solve the problem of navigating between
+    feature modules:
+    1. Have a navigation module that's aware of every module and can navigate everywhere.
+    2. Use deeplinks.
+    In this project we use deeplinks.
+    To enable deeplinks, we need to add a deeplink like:
+    <deepLink app:uri="petsave://animalsnearyou" /> in the destination nav graph. In this project
+    the destination is the animalsNearYou navigation graph. Then we need to add to app
+    android manifest file a tag like: <nav-graph android:value="@navigation/nav_graph" />
+    in the activity we will navigate to. Since we use only single activity and multiple
+    fragments, we add this tag to MainActivity.
+    -->

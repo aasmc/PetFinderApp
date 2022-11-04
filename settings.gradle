@@ -6,3 +6,4 @@ include ':common'
 include ':features:animalsnearyou'
 include ':features:search'
 
+include ':features:onboarding'

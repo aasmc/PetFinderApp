@@ -1,7 +1,7 @@
 package ru.aasmc.petfinderapp.onboarding.presentation
 
 import androidx.annotation.StringRes
-import ru.aasmc.petfinderapp.R
+import ru.aasmc.petfinderapp.onboarding.R
 
 data class OnboardingViewState(
     val postcode: String = "",

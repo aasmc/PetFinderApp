@@ -27,7 +27,6 @@ import ru.aasmc.petfinderapp.search.domain.usecases.GetSearchFilters
 // TODO Fix UI errors:
 // 1. search filters disappear after a few unsuccessful attempts. bug with adapter
 // 2. different error fields are shown at the same time
-
 @AndroidEntryPoint
 class SearchFragment : Fragment() {
 

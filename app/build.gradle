@@ -43,6 +43,7 @@ dependencies {
     implementation project(":common")
     implementation project(":features:animalsnearyou")
     implementation project(":features:search")
+    implementation project(":features:onboarding")
 
     // Kotlin
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"

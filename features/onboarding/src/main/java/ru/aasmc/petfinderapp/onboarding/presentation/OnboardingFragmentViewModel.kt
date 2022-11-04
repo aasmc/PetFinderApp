@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.aasmc.petfinderapp.R
 import ru.aasmc.petfinderapp.common.utils.createExceptionHandler
+import ru.aasmc.petfinderapp.onboarding.R
 import ru.aasmc.petfinderapp.onboarding.domain.usecases.StoreOnboardingData
 import javax.inject.Inject
 

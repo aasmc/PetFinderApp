@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
     private val appBarConfiguration by lazy {
         AppBarConfiguration(
             topLevelDestinationIds = setOf(
-                R.id.onboardingFragment,
+                ru.aasmc.petfinderapp.onboarding.R.id.onboardingFragment,
                 ru.aasmc.petfinderapp.animalsnearyou.R.id.animalsNearYouFragment,
                 ru.aasmc.petfinderapp.search.R.id.searchFragment
             )
@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun hideBottomNavWhenInOnboarding() {
         navController.addOnDestinationChangedListener {_, destination, _ ->
-            if (destination.id == R.id.onboardingFragment) {
+            if (destination.id == ru.aasmc.petfinderapp.onboarding.R.id.onboardingFragment) {
                 binding.bottomNavigation.visibility = View.GONE
             } else {
                 binding.bottomNavigation.visibility = View.VISIBLE
