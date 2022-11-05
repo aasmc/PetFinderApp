@@ -10,12 +10,15 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.snackbar.Snackbar
-import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.EntryPointAccessors
 import kotlinx.coroutines.launch
 import ru.aasmc.petfinderapp.common.utils.setImage
+import ru.aasmc.petfinderapp.di.SharingModuleDependencies
 import ru.aasmc.petfinderapp.sharing.databinding.FragmentSharingBinding
+import ru.aasmc.petfinderapp.sharing.di.DaggerSharingComponent
+import ru.aasmc.petfinderapp.sharing.di.ViewModelFactory
+import javax.inject.Inject
 
-@AndroidEntryPoint
 class SharingFragment : Fragment() {
     companion object {
         const val ANIMAL_ID = "id"
@@ -25,7 +28,28 @@ class SharingFragment : Fragment() {
     private val binding: FragmentSharingBinding
         get() = _binding!!
 
-    private val viewModel: SharingFragmentViewModel by viewModels()
+    @Inject
+    lateinit var viewModelFactory: ViewModelFactory
+
+    private val viewModel by viewModels<SharingFragmentViewModel>() {
+        viewModelFactory
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        DaggerSharingComponent.builder()
+            .context(requireActivity())
+            .moduleDependencies(
+                // this Hilt method gives us access to the entry point of the app
+                // which gives us access to the dependency graph.
+                EntryPointAccessors.fromApplication(
+                    requireActivity().applicationContext,
+                    SharingModuleDependencies::class.java
+                )
+            )
+            .build()
+            .inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

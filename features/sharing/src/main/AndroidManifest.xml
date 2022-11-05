@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="ru.aasmc.petfinderapp.sharing">
+    xmlns:dist="http://schemas.android.com/apk/distribution"
+    package="ru.aasmc.petfinderapp.sharing">
+
+    <dist:module
+        dist:instant="false"
+        dist:title="@string/dynamic_feature_sharing_title">
+        <dist:delivery>
+            <dist:on-demand />
+        </dist:delivery>
+        <dist:fusing dist:include="true" />
+    </dist:module>
 
 </manifest>

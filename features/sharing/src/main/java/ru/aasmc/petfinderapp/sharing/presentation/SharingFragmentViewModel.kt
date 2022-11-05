@@ -12,7 +12,6 @@ import ru.aasmc.petfinderapp.common.domain.usecases.GetAnimalDetails
 import ru.aasmc.petfinderapp.sharing.presentation.model.mappers.UiAnimalToShareMapper
 import javax.inject.Inject
 
-@HiltViewModel
 class SharingFragmentViewModel @Inject constructor(
     private val getAnimalDetails: GetAnimalDetails,
     private val uiAnimalToShareMapper: UiAnimalToShareMapper
