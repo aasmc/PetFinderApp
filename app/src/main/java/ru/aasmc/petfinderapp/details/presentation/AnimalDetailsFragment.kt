@@ -1,6 +1,9 @@
 package ru.aasmc.petfinderapp.details.presentation
 
 import android.annotation.SuppressLint
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.graphics.Rect
 import android.os.Bundle
 import android.view.GestureDetector
@@ -15,6 +18,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.airbnb.lottie.LottieProperty
+import com.airbnb.lottie.model.KeyPath
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -132,8 +137,19 @@ class AnimalDetailsFragment : Fragment() {
     private fun startAnimation(@RawRes animationRes: Int) {
         binding.loader.apply {
             isVisible = true
+            setMinFrame(50)
+            setMaxFrame(112)
+            speed = 1.5f
             setAnimation(animationRes)
             playAnimation()
+        }
+        // adds custom color filter for the layer we want to modify
+        // in this case - icon_circle
+        binding.loader.addValueCallback(
+            KeyPath("icon_circle", "**"),
+            LottieProperty.COLOR_FILTER
+        ) {
+            PorterDuffColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_ATOP)
         }
     }
 
