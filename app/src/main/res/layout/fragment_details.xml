@@ -5,15 +5,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ProgressBar
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/loader"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:lottie_loop="true" />
 
     <ImageView
         android:id="@+id/image"
@@ -28,11 +24,11 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:contentDescription="@string/image_of_pet"
-        app:layout_constraintDimensionRatio="H,10:8"
-        app:layout_constraintTop_toTopOf="@id/image"
         app:layout_constraintBottom_toBottomOf="@id/image"
+        app:layout_constraintDimensionRatio="H,10:8"
+        app:layout_constraintEnd_toEndOf="@id/image"
         app:layout_constraintStart_toStartOf="@id/image"
-        app:layout_constraintEnd_toEndOf="@id/image"/>
+        app:layout_constraintTop_toTopOf="@id/image" />
 
     <TextView
         android:id="@+id/name"
@@ -142,9 +138,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/default_margin"
+        android:contentDescription="@string/contact"
         android:scaleX="0.6"
         android:scaleY="0.6"
-        android:contentDescription="@string/contact"
         android:src="@drawable/ic_call_24dp"
         app:backgroundTint="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -152,10 +148,10 @@
         app:tint="@android:color/white" />
 
     <androidx.constraintlayout.widget.Group
+        android:id="@+id/group"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/group"
-        app:constraint_referenced_ids="name, description, image, special_needs, special_needs_label, sprayed_neutered, sprayed_neutered_label, divider, tags, call, heart_image"/>
+        app:constraint_referenced_ids="name, description, image, special_needs, special_needs_label, sprayed_neutered, sprayed_neutered_label, divider, tags, call, heart_image" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

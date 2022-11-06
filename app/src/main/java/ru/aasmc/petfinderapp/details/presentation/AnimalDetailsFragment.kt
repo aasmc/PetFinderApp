@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RawRes
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
@@ -116,26 +117,31 @@ class AnimalDetailsFragment : Fragment() {
     }
 
     private fun displayError() {
-        startAnimation()
+        startAnimation(R.raw.lazy_cat)
         binding.group.isVisible = false
         Snackbar.make(requireView(), R.string.an_error_occurred, Snackbar.LENGTH_SHORT)
             .show()
     }
 
     private fun displayLoading() {
-        startAnimation()
+        startAnimation(R.raw.happy_dog)
         binding.group.isVisible = false
     }
 
     //TODO: add method parameter for animation resource
-    private fun startAnimation() {
-        //TODO: Replace with code to initialize and start Lottie animation
-        binding.loader.isVisible = true
+    private fun startAnimation(@RawRes animationRes: Int) {
+        binding.loader.apply {
+            isVisible = true
+            setAnimation(animationRes)
+            playAnimation()
+        }
     }
 
     private fun stopAnimation() {
-        // TODO replace with code to stop Lottie animation
-        binding.loader.isVisible = false
+        binding.loader.apply {
+            cancelAnimation()
+            isVisible = false
+        }
     }
 
     private fun areViewsOverlapping(view1: View, view2: View): Boolean {
