@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.graphics.Rect
+import android.graphics.drawable.Animatable
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.LayoutInflater
@@ -101,7 +102,7 @@ class AnimalDetailsFragment : Fragment() {
         val doubleTapGestureListener =
             object : GestureDetector.SimpleOnGestureListener() {
                 override fun onDoubleTap(e: MotionEvent): Boolean {
-                    //TODO: start animation on double tap
+                    (binding.heartImage.drawable as Animatable?)?.start()
                     return true
                 }
 

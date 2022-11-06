@@ -24,6 +24,7 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:contentDescription="@string/image_of_pet"
+        app:srcCompat="@drawable/heart_fill_animation"
         app:layout_constraintBottom_toBottomOf="@id/image"
         app:layout_constraintDimensionRatio="H,10:8"
         app:layout_constraintEnd_toEndOf="@id/image"
