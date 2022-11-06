@@ -4,6 +4,7 @@ object ApiConstants {
     const val BASE_ENDPOINT = "https://api.petfinder.com/v2/"
     const val AUTH_ENDPOINT = "oauth2/token/"
     const val ANIMALS_ENDPOINT = "animals"
+    const val ANIMAL_ENDPOINT = "animal"
 }
 
 object ApiParameters {
@@ -21,4 +22,6 @@ object ApiParameters {
     const val NAME = "name"
     const val AGE = "age"
     const val TYPE = "type"
+
+    const val ID = "id"
 }

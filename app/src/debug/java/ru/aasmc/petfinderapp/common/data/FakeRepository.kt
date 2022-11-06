@@ -3,6 +3,7 @@ package ru.aasmc.petfinderapp.common.data
 import io.reactivex.BackpressureStrategy
 import io.reactivex.Flowable
 import io.reactivex.Observable
+import io.reactivex.Single
 import ru.aasmc.petfinderapp.common.domain.model.animal.AdoptionStatus
 import ru.aasmc.petfinderapp.common.domain.model.animal.Animal
 import ru.aasmc.petfinderapp.common.domain.model.animal.Media
@@ -178,5 +179,9 @@ class FakeRepository @Inject constructor() : AnimalRepository {
             matches,
             Pagination(currentPage = 1, totalPages = 1)
         )
+    }
+
+    override fun getAnimal(animalId: Long): Single<AnimalWithDetails> {
+        TODO("Not yet implemented")
     }
 }

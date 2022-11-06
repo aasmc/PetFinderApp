@@ -29,19 +29,14 @@ class SearchAnimals @Inject constructor(
             .map { it.trim() }
             .filter { it.length >= 2 }
 
-        val age = ageSubject.replaceUIEmptyValue()
-        val type = typeSubject.replaceUIEmptyValue()
 
-        return Observable.combineLatest(query, age, type, combiningFunction)
+        return Observable.combineLatest(query, ageSubject, typeSubject, combiningFunction)
             .toFlowable(BackpressureStrategy.LATEST)
             .switchMap { parameters: SearchParameters ->
                 animalRepository.searchCachedAnimalsBy(parameters)
             }
     }
 
-    private fun BehaviorSubject<String>.replaceUIEmptyValue() = map {
-        if (it == GetSearchFilters.NO_FILTER_SELECTED) "" else it
-    }
 
     private val combiningFunction: Function3<String, String, String, SearchParameters>
         get() = Function3 { query, search, type ->

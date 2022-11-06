@@ -10,12 +10,14 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.aasmc.petfinderapp.R
+import ru.aasmc.petfinderapp.common.presentation.AnimalClickListener
 import ru.aasmc.petfinderapp.common.presentation.AnimalsAdapter
 import ru.aasmc.petfinderapp.common.presentation.Event
 import ru.aasmc.petfinderapp.databinding.FragmentAnimalsNearYouBinding
@@ -51,7 +53,7 @@ class AnimalsNearYouFragment : Fragment() {
     }
 
     private fun requestInitialAnimalsList() {
-        viewModel.onEvent(AnimalsNearYouEvent.RequestInitialAnimalsList)
+        viewModel.onEvent(AnimalsNearYouEvent.LoadAnimals)
     }
 
     /**
@@ -85,7 +87,14 @@ class AnimalsNearYouFragment : Fragment() {
     }
 
     private fun createAdapter(): AnimalsAdapter {
-        return AnimalsAdapter()
+        return AnimalsAdapter().apply {
+            setOnAnimalClickListener(object: AnimalClickListener {
+                override fun onClick(animalId: Long) {
+                    val action = AnimalsNearYouFragmentDirections.actionAnimalsNearYouToDetails(animalId)
+                    findNavController().navigate(action)
+                }
+            })
+        }
     }
 
     private fun setupRecyclerView(animalsAdapter: AnimalsAdapter) {
@@ -113,7 +122,7 @@ class AnimalsNearYouFragment : Fragment() {
     }
 
     private fun requestMoreAnimals() {
-        viewModel.onEvent(AnimalsNearYouEvent.RequestMoreAnimals)
+        viewModel.onEvent(AnimalsNearYouEvent.LoadAnimals)
     }
 
     private fun subscribeToViewStateUpdates(adapter: AnimalsAdapter) {

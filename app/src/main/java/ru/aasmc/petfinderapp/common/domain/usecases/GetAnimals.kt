@@ -1,4 +1,4 @@
-package ru.aasmc.petfinderapp.animalsnearyou.domain.usecases
+package ru.aasmc.petfinderapp.common.domain.usecases
 
 import ru.aasmc.petfinderapp.common.domain.repositories.AnimalRepository
 import javax.inject.Inject

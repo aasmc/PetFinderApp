@@ -1,5 +1,7 @@
 package ru.aasmc.petfinderapp.search.domain.usecases
 
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import ru.aasmc.petfinderapp.common.domain.model.NoMoreAnimalsException
 import ru.aasmc.petfinderapp.common.domain.model.pagination.Pagination
@@ -21,6 +23,9 @@ class SearchAnimalsRemotely @Inject constructor(
         return withContext(dispatchersProvider.io()) {
             val (animals, pagination) =
                 animalRepository.searchAnimalsRemotely(pageToLoad, searchParameters, pageSize)
+            if (!coroutineContext.isActive) {
+                throw CancellationException("Cancelled because new data was requested")
+            }
             if (animals.isEmpty()) {
                 throw NoMoreAnimalsException("Couldn't find more animals that match the search parameters.")
             }

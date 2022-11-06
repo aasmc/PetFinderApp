@@ -9,12 +9,50 @@
         android:id="@+id/animalsNearYou"
         android:name="ru.aasmc.petfinderapp.animalsnearyou.presentation.AnimalsNearYouFragment"
         android:label="@string/animals_near_you_screen_label"
-        tools:layout="@layout/fragment_animals_near_you" />
+        tools:layout="@layout/fragment_animals_near_you">
+        <action
+            android:id="@+id/action_animalsNearYou_to_details"
+            app:destination="@id/details">
+            <argument
+                android:name="id"
+                app:argType="long" />
+        </action>
+    </fragment>
 
     <fragment
         android:id="@+id/search"
         android:name="ru.aasmc.petfinderapp.search.presentation.SearchFragment"
         android:label="@string/search_screen_label"
-        tools:layout="@layout/fragment_search" />
+        tools:layout="@layout/fragment_search" >
+        <action
+            android:id="@+id/action_search_to_details"
+            app:destination="@id/details">
+            <argument
+                android:name="id"
+                app:argType="long" />
+        </action>
+    </fragment>
+
+    <fragment
+        android:id="@+id/details"
+        android:name="ru.aasmc.petfinderapp.details.presentation.AnimalDetailsFragment"
+        android:label="@string/animal_details"
+        tools:layout="@layout/fragment_details">
+
+        <argument
+            android:name="id"
+            app:argType="long" />
+
+        <action
+            android:id="@+id/action_details_to_secret"
+            app:destination="@id/secret" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/secret"
+        android:name="ru.aasmc.petfinderapp.easteregg.SecretFragment"
+        android:label="@string/secret_doggo"
+        tools:layout="@layout/fragment_secret">
+    </fragment>
 
 </navigation>

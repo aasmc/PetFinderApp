@@ -1,6 +1,7 @@
 package ru.aasmc.petfinderapp.common.domain.repositories
 
 import io.reactivex.Flowable
+import io.reactivex.Single
 import ru.aasmc.petfinderapp.common.domain.model.animal.Animal
 import ru.aasmc.petfinderapp.common.domain.model.animal.details.Age
 import ru.aasmc.petfinderapp.common.domain.model.animal.details.AnimalWithDetails
@@ -27,5 +28,9 @@ interface AnimalRepository {
         searchParameters: SearchParameters,
         numberOfItems: Int
     ): PaginatedAnimals
+
+    fun getAnimal(
+        animalId: Long
+    ): Single<AnimalWithDetails>
 
 }

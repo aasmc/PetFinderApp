@@ -1,4 +1,4 @@
-package ru.aasmc.petfinderapp.animalsnearyou.domain.usecases
+package ru.aasmc.petfinderapp.common.domain.usecases
 
 import kotlinx.coroutines.withContext
 import ru.aasmc.petfinderapp.common.domain.model.NoMoreAnimalsException

@@ -1,6 +1,7 @@
 package ru.aasmc.petfinderapp.common.data.cache
 
 import io.reactivex.Flowable
+import io.reactivex.Single
 import ru.aasmc.petfinderapp.common.data.cache.daos.AnimalsDao
 import ru.aasmc.petfinderapp.common.data.cache.daos.OrganizationsDao
 import ru.aasmc.petfinderapp.common.data.cache.model.cachedanimal.CachedAnimalAggregate
@@ -23,6 +24,10 @@ class RoomCache @Inject constructor(
         organizationsDao.insert(organizations)
     }
 
+    override fun getOrganization(organizationId: String): Single<CachedOrganization> {
+        return organizationsDao.getOrganization(organizationId)
+    }
+
     override suspend fun getAllTypes(): List<String> =
         animalsDao.getAllTypes()
 
@@ -32,5 +37,9 @@ class RoomCache @Inject constructor(
         type: String
     ): Flowable<List<CachedAnimalAggregate>> {
         return animalsDao.searchAnimalsBy(name, age, type)
+    }
+
+    override fun getAnimal(animalId: Long): Single<CachedAnimalAggregate> {
+        return animalsDao.getAnimal(animalId)
     }
 }

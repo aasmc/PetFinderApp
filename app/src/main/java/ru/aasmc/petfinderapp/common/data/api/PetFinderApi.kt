@@ -1,7 +1,9 @@
 package ru.aasmc.petfinderapp.common.data.api
 
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
+import ru.aasmc.petfinderapp.common.data.api.model.ApiAnimal
 import ru.aasmc.petfinderapp.common.data.api.model.ApiPaginatedAnimals
 
 interface PetFinderApi {
@@ -23,4 +25,9 @@ interface PetFinderApi {
         @Query(ApiParameters.LOCATION) postcode: String,
         @Query(ApiParameters.DISTANCE) maxDistance: Int
     ): ApiPaginatedAnimals
+
+    @GET(ApiConstants.ANIMAL_ENDPOINT + "/" + ApiParameters.ID)
+    suspend fun getAnimalDetails(
+        @Path(ApiParameters.ID) ID: Int
+    ): ApiAnimal
 }

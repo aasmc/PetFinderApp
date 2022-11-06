@@ -17,12 +17,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import okio.IOException
-import retrofit2.HttpException
 import ru.aasmc.petfinderapp.R
-import ru.aasmc.petfinderapp.common.domain.model.NoMoreAnimalsException
 import ru.aasmc.petfinderapp.common.presentation.AnimalsAdapter
 import ru.aasmc.petfinderapp.common.presentation.Event
 import ru.aasmc.petfinderapp.databinding.FragmentSearchBinding
@@ -143,7 +139,7 @@ class SearchFragment : Fragment() {
         // on the initial state or when the filter content was already handled.
         if (filterValues == null || filterValues.isEmpty()) return
         filter.setAdapter(createFilterAdapter(filterValues))
-        filter.setText(GetSearchFilters.NO_FILTER_SELECTED, false)
+        filter.setText(GetSearchFilters.DEFAULT_VALUE, false)
     }
 
     private fun createFilterAdapter(

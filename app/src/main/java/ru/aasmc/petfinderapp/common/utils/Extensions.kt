@@ -35,3 +35,8 @@ inline fun CoroutineScope.createExceptionHandler(
         action(throwable)
     }
 }
+
+/**
+ * Extension that returns Yes if a Boolean is true, else No
+ */
+fun Boolean.toEnglish() = if (this) "Yes" else "No"

@@ -1,6 +1,7 @@
 package ru.aasmc.petfinderapp.common.data
 
 import io.reactivex.Flowable
+import io.reactivex.Single
 import retrofit2.HttpException
 import ru.aasmc.petfinderapp.common.data.api.PetFinderApi
 import ru.aasmc.petfinderapp.common.data.api.model.mappers.ApiAnimalMapper
@@ -121,5 +122,20 @@ class PetFinderAnimalRepository @Inject constructor(
             apiAnimals?.map { apiAnimalMapper.mapToDomain(it) }.orEmpty(),
             apiPaginationMapper.mapToDomain(apiPagination)
         )
+    }
+
+    override fun getAnimal(animalId: Long): Single<AnimalWithDetails> {
+        return cache.getAnimal(animalId)
+            .flatMap { animal ->
+                cache.getOrganization(animal.animal.organizationId)
+                    .map {
+                        animal.animal.toDomain(
+                            animal.photos,
+                            animal.videos,
+                            animal.tags,
+                            it
+                        )
+                    }
+            }
     }
 }

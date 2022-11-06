@@ -12,8 +12,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import ru.aasmc.petfinderapp.animalsnearyou.domain.usecases.GetAnimals
-import ru.aasmc.petfinderapp.animalsnearyou.domain.usecases.RequestNextPageOfAnimals
+import ru.aasmc.petfinderapp.common.domain.usecases.GetAnimals
+import ru.aasmc.petfinderapp.common.domain.usecases.RequestNextPageOfAnimals
 import ru.aasmc.petfinderapp.common.domain.model.NetworkException
 import ru.aasmc.petfinderapp.common.domain.model.NetworkUnavailableException
 import ru.aasmc.petfinderapp.common.domain.model.NoMoreAnimalsException
@@ -21,6 +21,7 @@ import ru.aasmc.petfinderapp.common.domain.model.pagination.Pagination
 import ru.aasmc.petfinderapp.common.presentation.Event
 import ru.aasmc.petfinderapp.common.presentation.model.UIAnimal
 import ru.aasmc.petfinderapp.common.presentation.model.mappers.UiAnimalMapper
+import ru.aasmc.petfinderapp.common.utils.DispatchersProvider
 import ru.aasmc.petfinderapp.common.utils.createExceptionHandler
 import ru.aasmc.petfinderapp.logging.Logger
 import javax.inject.Inject
@@ -55,8 +56,7 @@ class AnimalsNearYouFragmentViewModel @Inject constructor(
 
     fun onEvent(event: AnimalsNearYouEvent) {
         when (event) {
-            AnimalsNearYouEvent.RequestInitialAnimalsList -> loadAnimals()
-            AnimalsNearYouEvent.RequestMoreAnimals -> loadNextAnimalPage()
+            AnimalsNearYouEvent.LoadAnimals -> loadAnimals()
         }
     }
 

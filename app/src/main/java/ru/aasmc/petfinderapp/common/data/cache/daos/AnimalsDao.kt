@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import io.reactivex.Flowable
+import io.reactivex.Single
 import ru.aasmc.petfinderapp.common.data.cache.model.cachedanimal.CachedAnimalAggregate
 import ru.aasmc.petfinderapp.common.data.cache.model.cachedanimal.CachedAnimalWithDetails
 import ru.aasmc.petfinderapp.common.data.cache.model.cachedanimal.CachedPhoto
@@ -26,6 +27,12 @@ abstract class AnimalsDao {
     @Transaction
     @Query("SELECT * FROM animals")
     abstract fun getAllAnimals(): Flowable<List<CachedAnimalAggregate>>
+
+    @Transaction
+    @Query("SELECT * FROM animals WHERE animalId IS :animalId")
+    abstract fun getAnimal(
+        animalId: Long
+    ): Single<CachedAnimalAggregate>
 
     /**
      * No need to add @Transaction here, because [Room] performs inserts in transaction.

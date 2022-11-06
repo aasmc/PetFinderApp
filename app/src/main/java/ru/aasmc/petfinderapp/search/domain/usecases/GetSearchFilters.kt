@@ -1,7 +1,10 @@
 package ru.aasmc.petfinderapp.search.domain.usecases
 
 import kotlinx.coroutines.withContext
+import ru.aasmc.petfinderapp.common.domain.model.MenuValueException
 import ru.aasmc.petfinderapp.common.domain.model.animal.details.Age
+import ru.aasmc.petfinderapp.common.domain.model.animal.details.AnimalWithDetails
+import ru.aasmc.petfinderapp.common.domain.model.animal.details.Details
 import ru.aasmc.petfinderapp.common.domain.repositories.AnimalRepository
 import ru.aasmc.petfinderapp.common.utils.DispatchersProvider
 import ru.aasmc.petfinderapp.search.domain.model.SearchFilters
@@ -16,31 +19,36 @@ class GetSearchFilters @Inject constructor(
         /**
          * Default value for all [SearchFilters].
          */
-        const val NO_FILTER_SELECTED = "Any"
+        const val DEFAULT_VALUE = "Any"
+        private const val DEFAULT_VALUE_LOWERCASE = "any"
+
     }
 
     suspend operator fun invoke(): SearchFilters {
         return withContext(dispatchersProvider.io()) {
-            val unknown = Age.UNKNOWN.name
-            val types = listOf(NO_FILTER_SELECTED) + animalRepository.getAnimalTypes()
+            val types = animalRepository.getAnimalTypes()
+            val filteringValues =
+                if (types.any { it.lowercase(Locale.ROOT) == DEFAULT_VALUE_LOWERCASE }) {
+                    types
+                } else {
+                    listOf(DEFAULT_VALUE) + types
+                }
+            if (types.isEmpty()) throw MenuValueException("No animal types")
 
             val ages = animalRepository.getAnimalAges()
-                .map { age ->
-                    if (age.name == unknown) {
-                        NO_FILTER_SELECTED
-                    } else {
-                        age.name
-                            .uppercase()
-                            .replaceFirstChar { firstChar ->
-                                if (firstChar.isLowerCase()) {
-                                    firstChar.titlecase(Locale.ROOT)
-                                } else {
-                                    firstChar.toString()
-                                }
-                            }
+                .map { it.name }
+                .replace(Age.UNKNOWN.name, DEFAULT_VALUE)
+                .map {
+                    it.lowercase(Locale.ROOT).replaceFirstChar { ch ->
+                        if (ch.isLowerCase()) ch.titlecase(Locale.getDefault()) else ch.toString()
                     }
                 }
+
             return@withContext SearchFilters(ages, types)
         }
+    }
+
+    private fun List<String>.replace(old: String, new: String): List<String> {
+        return map { if (it == old) new else it }
     }
 }
