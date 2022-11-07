@@ -156,6 +156,9 @@ dependencies {
     // Lottie
     implementation "com.airbnb.android:lottie:5.0.1"
 
+    // Dynamic animation
+    implementation "androidx.dynamicanimation:dynamicanimation:1.0.0"
+
     androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
 
     // Utils

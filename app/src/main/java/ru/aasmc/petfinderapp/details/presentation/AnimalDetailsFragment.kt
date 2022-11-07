@@ -14,11 +14,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RawRes
 import androidx.core.view.isVisible
+import androidx.dynamicanimation.animation.DynamicAnimation
+import androidx.dynamicanimation.animation.FlingAnimation
+import androidx.dynamicanimation.animation.SpringAnimation
+import androidx.dynamicanimation.animation.SpringForce
+import androidx.dynamicanimation.animation.SpringForce.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import com.airbnb.lottie.LottieProperty
 import com.airbnb.lottie.model.KeyPath
 import com.google.android.material.snackbar.Snackbar
@@ -45,6 +51,54 @@ class AnimalDetailsFragment : Fragment() {
     private val viewModel: AnimalDetailsViewModel by viewModels()
 
     private var animalId: Long? = null
+
+    private val springForce: SpringForce by lazy {
+        SpringForce().apply {
+            // describe how oscillations in a system decay after a disturbance
+            dampingRatio = DAMPING_RATIO_HIGH_BOUNCY
+            // The stiffer the spring is, the more force it applies to the attached
+            // object when the spring is not at the final position.
+            stiffness = STIFFNESS_VERY_LOW
+        }
+    }
+
+    /**
+     * Create a SpringAnimation for scaleX property.
+     */
+    private val callScaleXSpringAnimation: SpringAnimation by lazy {
+        SpringAnimation(binding.call, DynamicAnimation.SCALE_X).apply {
+            spring = springForce
+        }
+    }
+
+    /**
+     * Create a SpringAnimation for scaleY property.
+     */
+    private val callScaleYSpringAnimation: SpringAnimation by lazy {
+        SpringAnimation(binding.call, DynamicAnimation.SCALE_Y).apply {
+            spring = springForce
+        }
+    }
+
+    private val FLING_FRICTION = 2f
+
+    private val callFlingXAnimation: FlingAnimation by lazy {
+        FlingAnimation(binding.call, DynamicAnimation.X).apply {
+            friction = FLING_FRICTION
+            setMinValue(0f)
+            setMaxValue(binding.root.width.toFloat() - binding.call.width.toFloat())
+        }
+    }
+
+    private val callFlingYAnimation: FlingAnimation by lazy {
+        FlingAnimation(binding.call, DynamicAnimation.Y).apply {
+            // the greater the friction is, the sooner the animation will slow down
+            // 2.0f means, that it takes a bit of effort to fling the button onto the image
+            friction = FLING_FRICTION
+            setMinValue(0f)
+            setMaxValue(binding.root.height.toFloat() - binding.call.width.toFloat())
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -115,11 +169,40 @@ class AnimalDetailsFragment : Fragment() {
             doubleTapGestureDetector.onTouchEvent(event)
         }
 
-        //TODO: start scaling Spring Animation
+        // start both scaleX and scaleY animations
+        callScaleXSpringAnimation.animateToFinalPosition(FLING_SCALE)
+        callScaleYSpringAnimation.animateToFinalPosition(FLING_SCALE)
 
-        //TODO: Create and set fling Gesture Listener
+        val flingGestureListener = object : GestureDetector.SimpleOnGestureListener() {
+            // tell that the fling has been consumed by the view the listener is attached to
+            override fun onFling(
+                e1: MotionEvent?,
+                e2: MotionEvent?,
+                velocityX: Float,
+                velocityY: Float
+            ): Boolean {
+                callFlingXAnimation.setStartVelocity(velocityX).start()
+                callFlingYAnimation.setStartVelocity(velocityY).start()
+                return true
+            }
 
-        //TODO: Add end listener for fling animation
+            // tell that the tap event has been consumed by the view the listener
+            // is attached to
+            override fun onDown(e: MotionEvent?): Boolean = true
+        }
+
+        val flingGestureDetector = GestureDetector(requireContext(), flingGestureListener)
+
+        binding.call.setOnTouchListener { v, event ->
+            flingGestureDetector.onTouchEvent(event)
+        }
+
+        callFlingYAnimation.addEndListener { _, _, _, _ ->
+            if (areViewsOverlapping(binding.call, binding.image)) {
+                val action = AnimalDetailsFragmentDirections.actionDetailsToSecret()
+                findNavController().navigate(action)
+            }
+        }
     }
 
     private fun displayError() {
@@ -134,7 +217,6 @@ class AnimalDetailsFragment : Fragment() {
         binding.group.isVisible = false
     }
 
-    //TODO: add method parameter for animation resource
     private fun startAnimation(@RawRes animationRes: Int) {
         binding.loader.apply {
             isVisible = true
