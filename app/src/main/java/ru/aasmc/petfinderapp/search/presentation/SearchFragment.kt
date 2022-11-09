@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import androidx.annotation.IdRes
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -14,11 +15,13 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import ru.aasmc.petfinderapp.R
+import ru.aasmc.petfinderapp.common.presentation.AnimalClickListener
 import ru.aasmc.petfinderapp.common.presentation.AnimalsAdapter
 import ru.aasmc.petfinderapp.common.presentation.Event
 import ru.aasmc.petfinderapp.databinding.FragmentSearchBinding
@@ -65,7 +68,14 @@ class SearchFragment : Fragment() {
     }
 
     private fun createAdapter(): AnimalsAdapter {
-        return AnimalsAdapter()
+        return AnimalsAdapter().apply {
+            setOnAnimalClickListener(object : AnimalClickListener {
+                override fun onClick(animalId: Long) {
+                    val action = SearchFragmentDirections.actionSearchToDetails(animalId)
+                    findNavController().navigate(action)
+                }
+            })
+        }
     }
 
     private fun setupRecyclerView(searchAdapter: AnimalsAdapter) {
@@ -103,18 +113,8 @@ class SearchFragment : Fragment() {
 
         updateInitialStateViews(initialState)
         searchAdapter.submitList(searchResults)
-
-        with(binding.searchWidget) {
-            setupFilterValues(
-                age,
-                ageFilterValues.getContentIfNotHandled()
-            )
-            setupFilterValues(
-                type,
-                typeFilterValues.getContentIfNotHandled()
-            )
-        }
-
+        setupMenuValues(ageFilterValues.getContentIfNotHandled(), R.id.age_dropdown)
+        setupMenuValues(typeFilterValues.getContentIfNotHandled(), R.id.type_dropdown)
         updateRemoteSearchViews(searchingRemotely)
         updateNoResultsViews(noResultsState)
         handleFailures(failure)
@@ -131,20 +131,24 @@ class SearchFragment : Fragment() {
         binding.searchRemotelyText.isVisible = searchingRemotely
     }
 
-    private fun setupFilterValues(
-        filter: AutoCompleteTextView,
-        filterValues: List<String>?
-    ) {
-        // return early if the list is either empty or null - for instance,
-        // on the initial state or when the filter content was already handled.
-        if (filterValues == null || filterValues.isEmpty()) return
-        filter.setAdapter(createFilterAdapter(filterValues))
-        filter.setText(GetSearchFilters.DEFAULT_VALUE, false)
+    private fun setupMenuValues(menuValues: List<String>?, @IdRes dropdownId: Int) {
+        if (menuValues == null || menuValues.isEmpty()) return
+
+        val dropdown: AutoCompleteTextView =
+            binding.collapsibleSearchParamsContainer.findViewById(dropdownId)
+
+        setupValuesFor(dropdown, menuValues)
     }
 
-    private fun createFilterAdapter(
-        adapterValues: List<String>
-    ): ArrayAdapter<String> {
+    private fun setupValuesFor(
+        dropdown: AutoCompleteTextView,
+        dropdownValues: List<String>
+    ) {
+        dropdown.setAdapter(createMenuAdapter(dropdownValues))
+        dropdown.setText(dropdownValues.first(), false)
+    }
+
+    private fun createMenuAdapter(adapterValues: List<String>): ArrayAdapter<String> {
         return ArrayAdapter(
             requireContext(),
             R.layout.dropdown_menu_popup_item,
@@ -175,13 +179,14 @@ class SearchFragment : Fragment() {
     }
 
     private fun prepareForSearch() {
-        setupFilterListeners()
+        setupDropdownMenuListeners()
         setupSearchViewListener()
         viewModel.onEvent(SearchEvent.PrepareForSearch)
     }
 
     private fun setupSearchViewListener() {
-        val searchView = binding.searchWidget.search
+        val searchView: SearchView =
+            binding.collapsibleSearchParamsContainer.findViewById(R.id.search)
 
         searchView.setOnQueryTextListener(
             object : SearchView.OnQueryTextListener {
@@ -204,22 +209,23 @@ class SearchFragment : Fragment() {
         )
     }
 
-    private fun setupFilterListeners() {
-        with(binding.searchWidget) {
-            setupFilterListenerFor(age) { item ->
-                viewModel.onEvent(SearchEvent.AgeValueSelected(item))
-            }
-            setupFilterListenerFor(type) { item ->
-                viewModel.onEvent(SearchEvent.TypeValueSelected(item))
-            }
+    private fun setupDropdownMenuListeners() {
+        setupDropdownMenuListenerFor(R.id.age_dropdown) { item ->
+            viewModel.onEvent(SearchEvent.AgeValueSelected(item))
+        }
+
+        setupDropdownMenuListenerFor(R.id.type_dropdown) { item ->
+            viewModel.onEvent(SearchEvent.TypeValueSelected(item))
         }
     }
 
-    private fun setupFilterListenerFor(
-        filter: AutoCompleteTextView,
+    private fun setupDropdownMenuListenerFor(
+        @IdRes dropdownMenu: Int,
         block: (item: String) -> Unit
     ) {
-        filter.onItemClickListener =
+        val dropdown: AutoCompleteTextView =
+            binding.collapsibleSearchParamsContainer.findViewById(dropdownMenu)
+        dropdown.onItemClickListener =
             AdapterView.OnItemClickListener { parent, _, position, _ ->
                 parent?.let {
                     block(it.adapter.getItem(position) as String)

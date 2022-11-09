@@ -6,7 +6,8 @@ sealed class AnimalDetailsViewState {
     object Loading : AnimalDetailsViewState()
 
     data class AnimalDetails(
-        val animal: UIAnimalDetailed
+        val animal: UIAnimalDetailed,
+        val adopted: Boolean = false
     ) : AnimalDetailsViewState()
 
     object Failure : AnimalDetailsViewState()

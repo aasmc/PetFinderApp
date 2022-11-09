@@ -36,7 +36,9 @@ class SearchFragmentViewModel @Inject constructor(
     private val searchAnimalsRemotely: SearchAnimalsRemotely,
     private val compositeDisposable: CompositeDisposable
 ) : ViewModel() {
+
     private var currentPage = 0
+    private var isLastPage = false
 
     private val _state = MutableStateFlow(SearchViewState())
     val state: StateFlow<SearchViewState> = _state.asStateFlow()
@@ -59,11 +61,19 @@ class SearchFragmentViewModel @Inject constructor(
             CancellationException("New search parameters incoming!")
         )
 
+        resetStateIfNoRemoteResults()
+
         when (event) {
             is SearchEvent.QueryInput -> updateQuery(event.input)
             is SearchEvent.AgeValueSelected -> updateAgeValue(event.age)
             is SearchEvent.TypeValueSelected -> updateTypeValue(event.type)
             else -> Logger.d("Wrong SearchEvent in onSearchParametersUpdate!")
+        }
+    }
+
+    private fun resetStateIfNoRemoteResults() {
+        if (state.value.isInNoSearchResultsState()) {
+            _state.update { oldState -> oldState.updateToSearching() }
         }
     }
 
@@ -177,10 +187,12 @@ class SearchFragmentViewModel @Inject constructor(
 
     private fun resetPagination() {
         currentPage = 0
+        isLastPage = false
     }
 
     private fun onPaginationInfoObtained(pagination: Pagination) {
         currentPage = pagination.currentPage
+        isLastPage = !pagination.canLoadMore
     }
 
     private fun onFailure(throwable: Throwable) {

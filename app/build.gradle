@@ -163,6 +163,7 @@ dependencies {
 
     // Utils
     coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:$desugar_jdk_libs_version"
+    implementation "com.jakewharton.threetenabp:threetenabp:$threetenabp_version"
 
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakcanary_version"
 }

@@ -32,6 +32,8 @@ class SearchAnimals @Inject constructor(
             .debounce(500L, TimeUnit.MILLISECONDS)
             .map { it.trim() }
             .filter { it.length >= 2 }
+            .distinctUntilChanged()
+
         val age = ageSubject.replaceUIEmptyValue()
         val type = typeSubject.replaceUIEmptyValue()
 

@@ -44,7 +44,7 @@ class GetSearchFilters @Inject constructor(
                     }
                 }
 
-            return@withContext SearchFilters(ages, types)
+            return@withContext SearchFilters(ages, filteringValues)
         }
     }
 

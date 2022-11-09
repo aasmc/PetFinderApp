@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 import ru.aasmc.petfinderapp.R
 import ru.aasmc.petfinderapp.common.presentation.model.UIAnimalDetailed
 import ru.aasmc.petfinderapp.common.utils.setImage
+import ru.aasmc.petfinderapp.common.utils.toEmoji
 import ru.aasmc.petfinderapp.common.utils.toEnglish
 import ru.aasmc.petfinderapp.databinding.FragmentDetailsBinding
 
@@ -129,7 +130,7 @@ class AnimalDetailsFragment : Fragment() {
                 viewModel.state.collect { state ->
                     when (state) {
                         is AnimalDetailsViewState.AnimalDetails -> {
-                            displayPetDetails(state.animal)
+                            displayPetDetails(state.animal, state.adopted)
                         }
                         AnimalDetailsViewState.Failure -> {
                             displayError()
@@ -144,7 +145,7 @@ class AnimalDetailsFragment : Fragment() {
     }
 
     @SuppressLint("ClickableViewAccessibility")
-    private fun displayPetDetails(animalDetails: UIAnimalDetailed) {
+    private fun displayPetDetails(animalDetails: UIAnimalDetailed, adopted: Boolean) {
         binding.call.scaleX = 0.6f
         binding.call.scaleY = 0.6f
         binding.call.isVisible = true
@@ -153,8 +154,11 @@ class AnimalDetailsFragment : Fragment() {
         binding.name.text = animalDetails.name
         binding.description.text = animalDetails.description
         binding.image.setImage(animalDetails.photo)
-        binding.sprayedNeutered.text = animalDetails.sprayNeutered.toEnglish()
-        binding.specialNeeds.text = animalDetails.specialNeeds.toEnglish()
+
+        binding.sprayedNeutered.text = animalDetails.sprayNeutered.toEmoji()
+        binding.specialNeeds.text = animalDetails.specialNeeds.toEmoji()
+        binding.declawed.text = animalDetails.declawed.toEmoji()
+        binding.shotsCurrent.text = animalDetails.shotsCurrent.toEmoji()
 
         val doubleTapGestureListener =
             object : GestureDetector.SimpleOnGestureListener() {

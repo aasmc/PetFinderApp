@@ -86,8 +86,11 @@ class PetFinderAnimalRepository @Inject constructor(
     override fun searchCachedAnimalsBy(
         searchParameters: SearchParameters
     ): Flowable<SearchResults> {
-        val (name, age, type) = searchParameters
-        return cache.searchAnimalsBy(name, age, type)
+        return cache.searchAnimalsBy(
+            searchParameters.uppercaseName,
+            searchParameters.uppercaseAge,
+            searchParameters.uppercaseType
+        )
             .distinctUntilChanged()
             .map { animalList ->
                 animalList.map {
