@@ -210,6 +210,15 @@ class AnimalDetailsFragment : Fragment() {
                 findNavController().navigate(action)
             }
         }
+
+        binding.adoptButton.setOnClickListener {
+            binding.adoptButton.startLoading()
+            viewModel.onEvent(AnimalDetailsEvent.AdoptAnimal)
+        }
+        if (adopted) {
+            binding.adoptButton.done()
+            binding.adoptButton.setOnClickListener(null)
+        }
     }
 
     private fun displayError() {
