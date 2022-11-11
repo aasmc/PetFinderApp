@@ -74,8 +74,7 @@
                 android:layout_marginStart="@dimen/default_margin"
                 android:layout_marginTop="@dimen/default_margin"
                 android:text="@string/special_needs"
-                android:textSize="@dimen/large_text"
-                android:textStyle="bold"
+                android:textAppearance="@style/PetLabelTextAppearance"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/divider" />
 
@@ -96,8 +95,7 @@
                 android:layout_marginStart="@dimen/default_margin"
                 android:layout_marginTop="@dimen/half_default_margin"
                 android:text="@string/sprayed_or_neutered"
-                android:textSize="@dimen/large_text"
-                android:textStyle="bold"
+                android:textAppearance="@style/PetLabelTextAppearance"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/special_needs_label" />
 
@@ -118,8 +116,7 @@
                 android:layout_marginStart="@dimen/default_margin"
                 android:layout_marginTop="@dimen/half_default_margin"
                 android:text="@string/declawed"
-                android:textSize="@dimen/large_text"
-                android:textStyle="bold"
+                android:textAppearance="@style/PetLabelTextAppearance"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/sprayed_neutered_label" />
 
@@ -172,8 +169,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_marginStart="24dp"
-                android:layout_marginEnd="24dp"
                 android:layout_marginTop="16dp"
+                android:layout_marginEnd="24dp"
                 app:layout_constraintTop_toBottomOf="@id/good_boi_label"
                 app:progressButton_text="@string/adopt" />
 
@@ -245,7 +242,7 @@
         app:backgroundTint="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:tint="@android:color/white"
+        app:tint="?attr/colorOnPrimary"
         tools:visibility="visible" />
 
 

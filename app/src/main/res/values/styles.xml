@@ -6,6 +6,8 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:colorBackground">@color/colorBackground</item>
+        <item name="progressButtonStyle">@style/ProgressButtonStyle</item>
     </style>
 
     <!-- Splash Screen Theme -->
@@ -13,6 +15,17 @@
         <item name="android:windowBackground">@drawable/splash_background</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
+    </style>
+
+    <style name="PetLabelTextAppearance" parent="TextAppearance.MaterialComponents.Headline3">
+        <item name="android:textSize">@dimen/large_text</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="ProgressButtonStyle">
+        <item name="progressButton_backgroundColor">?attr/colorPrimary</item>
+        <item name="progressButton_textColor">?attr/colorOnPrimary</item>
+        <item name="progressButton_progressColor">?attr/colorOnPrimary</item>
     </style>
 
 </resources>

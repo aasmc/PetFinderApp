@@ -2,6 +2,9 @@ package ru.aasmc.petfinderapp.common
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
@@ -35,6 +38,28 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setupActionBar()
         setupBottomNav()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.theme_options, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val themeMode = when(item.itemId) {
+            R.id.light_theme -> {
+                AppCompatDelegate.MODE_NIGHT_NO
+            }
+            R.id.dark_theme -> {
+                AppCompatDelegate.MODE_NIGHT_YES
+            }
+            else -> {
+                AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+            }
+        }
+        AppCompatDelegate.setDefaultNightMode(themeMode)
+        return true
     }
 
     override fun onSupportNavigateUp(): Boolean {

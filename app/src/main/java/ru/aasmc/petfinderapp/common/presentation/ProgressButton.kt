@@ -9,10 +9,10 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.LinearInterpolator
-import androidx.core.animation.addListener
 import androidx.core.content.ContextCompat
 import ru.aasmc.petfinderapp.R
 import ru.aasmc.petfinderapp.common.utils.dpToPx
@@ -21,37 +21,29 @@ import ru.aasmc.petfinderapp.common.utils.getTextWidth
 class ProgressButton @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
-) : View(context, attrs, defStyleAttr) {
+    // the attribute in the theme that specifies which style this view uses
+    defStyleAttr: Int = R.attr.progressButtonStyle,
+    // the style the view uses. this usually ships with the library or SDK.
+    defStyleRes: Int = R.style.ProgressButtonStyle
+) : View(context, attrs, defStyleAttr, defStyleRes) {
 
     private var buttonText = ""
-
-    init {
-        val typedArray =
-            context.obtainStyledAttributes(attrs, R.styleable.ProgressButton)
-        buttonText =
-            typedArray.getString(R.styleable.ProgressButton_progressButton_text) ?: ""
-        typedArray.recycle()
-    }
 
     private val textPaint = Paint().apply {
         // smooths the edges of the shapes painted on the screen
         isAntiAlias = true
         style = Paint.Style.FILL
-        color = Color.WHITE
         textSize = context.dpToPx(16f)
     }
 
     private val backgroundPaint = Paint().apply {
         isAntiAlias = true
-        style = Paint.Style.FILL
         color = ContextCompat.getColor(context, R.color.colorPrimary)
     }
 
     private val progressPaint = Paint().apply {
         isAntiAlias = true
         style = Paint.Style.STROKE
-        color = Color.WHITE
         strokeWidth = context.dpToPx(2f)
     }
 
@@ -67,6 +59,54 @@ class ProgressButton @JvmOverloads constructor(
     private var startAngle = 0f
 
     private var rotationAnimator: ValueAnimator? = null
+
+    init {
+        // passing defStyleAttr and defStyleRes helps check the values and
+        // resolve precedence
+        val typedArray =
+            context.obtainStyledAttributes(
+                attrs,
+                R.styleable.ProgressButton,
+                defStyleAttr,
+                defStyleRes
+            )
+
+        buttonText =
+            typedArray.getString(R.styleable.ProgressButton_progressButton_text) ?: ""
+
+        val typedValue = TypedValue()
+        // resolve the value of colorPrimary using theme from the context.
+        // Using the correct context is vital. If you try using an Activity context,
+        // it wil lead to inconsistencies since the Activity and the view can have different
+        // themes.
+        context.theme.resolveAttribute(android.R.attr.colorPrimary, typedValue, true)
+        val defaultBackgroundColor = typedValue.data
+        val defaultTextColor = Color.WHITE
+        val defaultProgressColor = Color.WHITE
+
+        val backgroundColor =
+            typedArray.getColor(
+                R.styleable.ProgressButton_progressButton_backgroundColor,
+                defaultBackgroundColor
+            )
+        backgroundPaint.color = backgroundColor
+
+        val textColor =
+            typedArray.getColor(
+                R.styleable.ProgressButton_progressButton_textColor,
+                defaultTextColor
+            )
+        textPaint.color = textColor
+
+        val progressColor =
+            typedArray.getColor(
+                R.styleable.ProgressButton_progressButton_progressColor,
+                defaultProgressColor
+            )
+        progressPaint.color = progressColor
+
+        typedArray.recycle()
+    }
 
     /**
      * Flag that indicates whether Canvas should draw the check icon.

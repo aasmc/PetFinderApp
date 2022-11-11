@@ -25,5 +25,8 @@
     <string name="good_boi_girl">Good boi/girl</string>
     <string name="declawed">Declawed</string>
     <string name="adopt">Adopt</string>
+    <string name="light_theme_menu_label">Light theme</string>
+    <string name="dark_theme_menu_label">Dark theme</string>
+    <string name="follow_system_menu_label">Follow system</string>
 </resources>
 
