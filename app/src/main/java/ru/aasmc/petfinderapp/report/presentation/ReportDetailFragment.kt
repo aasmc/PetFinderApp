@@ -1,6 +1,8 @@
 package ru.aasmc.petfinderapp.report.presentation
 
+import android.Manifest.permission.READ_EXTERNAL_STORAGE
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -12,6 +14,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import ru.aasmc.petfinderapp.databinding.FragmentReportDetailBinding
 import java.io.File
@@ -21,6 +24,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import javax.net.ssl.HttpsURLConnection
 
 class ReportDetailFragment : Fragment() {
+
     companion object {
         private const val API_URL = "https://example.com/?send_report"
         private const val REPORT_APP_ID = 46341L
@@ -31,6 +35,13 @@ class ReportDetailFragment : Fragment() {
     object ReportTracker {
         var reportNumber = AtomicInteger()
     }
+
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) {
+                selectImageFromGallery()
+            }
+        }
 
     private val selectImageFromGalleryResult =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
@@ -120,7 +131,18 @@ class ReportDetailFragment : Fragment() {
     }
 
     private fun uploadPhotoPressed() {
-        selectImageFromGallery()
+        context?.let {
+            if (ContextCompat.checkSelfPermission(
+                    it, READ_EXTERNAL_STORAGE
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                // request permission, if we have none
+                requestPermissionLauncher.launch(READ_EXTERNAL_STORAGE)
+            } else {
+                // we have permission, select image
+                selectImageFromGallery()
+            }
+        }
     }
 
     private fun selectImageFromGallery() =

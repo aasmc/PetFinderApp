@@ -38,5 +38,6 @@
     <string name="email">Email</string>
     <string name="login">Login</string>
     <string name="report_screen_label">Report a concern</string>
+    <string name="report">Report</string>
 </resources>
 
