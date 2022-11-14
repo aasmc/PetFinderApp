@@ -23,7 +23,7 @@
         android:id="@+id/search"
         android:name="ru.aasmc.petfinderapp.search.presentation.SearchFragment"
         android:label="@string/search_screen_label"
-        tools:layout="@layout/fragment_search" >
+        tools:layout="@layout/fragment_search">
         <action
             android:id="@+id/action_search_to_details"
             app:destination="@id/details">
@@ -53,6 +53,13 @@
         android:name="ru.aasmc.petfinderapp.easteregg.SecretFragment"
         android:label="@string/secret_doggo"
         tools:layout="@layout/fragment_secret">
+
     </fragment>
+
+    <fragment
+        android:id="@+id/report"
+        android:name="ru.aasmc.petfinderapp.report.presentation.ReportDetailFragment"
+        android:label="@string/report_screen_label"
+        tools:layout="@layout/fragment_report_detail" />
 
 </navigation>

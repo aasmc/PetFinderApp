@@ -28,5 +28,15 @@
     <string name="light_theme_menu_label">Light theme</string>
     <string name="dark_theme_menu_label">Dark theme</string>
     <string name="follow_system_menu_label">Follow system</string>
+    <string name="report_details">Report Details</string>
+    <string name="send_report">Send Report</string>
+    <string name="signup">Sign up</string>
+    <string name="upload_photo">Upload Photo</string>
+    <string name="permissionsLabel">Report Details Permission</string>
+    <string name="permissionDetail">Access the report details</string>
+    <string name="category">Category</string>
+    <string name="email">Email</string>
+    <string name="login">Login</string>
+    <string name="report_screen_label">Report a concern</string>
 </resources>
 

@@ -48,6 +48,13 @@ class AnimalsNearYouFragmentViewModel @Inject constructor(
     var isLoadingMoreAnimals: Boolean = false
         private set
 
+    private val _isLoggedIn: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn.asStateFlow()
+
+    fun setIsLoggedIn(loggedIn: Boolean) {
+        _isLoggedIn.update { loggedIn }
+    }
+
     private var currentPage = 0
 
     init {

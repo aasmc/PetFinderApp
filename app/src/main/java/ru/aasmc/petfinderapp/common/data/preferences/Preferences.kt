@@ -8,11 +8,15 @@ interface Preferences {
 
     fun putTokenType(tokenType: String)
 
+    fun putLastLoggedInTime()
+
     fun getToken(): String
 
     fun getTokenExpirationTime(): Long
 
     fun getTokenType(): String
+
+    fun getLastLoggedIn(): String?
 
     fun deleteTokenInfo()
 }

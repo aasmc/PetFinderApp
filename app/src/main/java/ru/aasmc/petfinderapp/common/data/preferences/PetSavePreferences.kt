@@ -3,9 +3,12 @@ package ru.aasmc.petfinderapp.common.data.preferences
 import android.content.Context
 import android.content.SharedPreferences
 import dagger.hilt.android.qualifiers.ApplicationContext
+import ru.aasmc.petfinderapp.common.data.preferences.PreferencesConstants.KEY_LAST_LOGIN
 import ru.aasmc.petfinderapp.common.data.preferences.PreferencesConstants.KEY_TOKEN
 import ru.aasmc.petfinderapp.common.data.preferences.PreferencesConstants.KEY_TOKEN_EXPIRATION_TIME
 import ru.aasmc.petfinderapp.common.data.preferences.PreferencesConstants.KEY_TOKEN_TYPE
+import java.text.DateFormat
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -32,6 +35,11 @@ class PetSavePreferences @Inject constructor(
         edit { putString(KEY_TOKEN_TYPE, tokenType) }
     }
 
+    override fun putLastLoggedInTime() {
+        val currentDateTimeString = DateFormat.getDateTimeInstance().format(Date())
+        edit { putString(KEY_LAST_LOGIN, currentDateTimeString) }
+    }
+
     override fun getToken(): String {
         return preferences.getString(KEY_TOKEN, "").orEmpty()
     }
@@ -42,6 +50,10 @@ class PetSavePreferences @Inject constructor(
 
     override fun getTokenType(): String {
         return preferences.getString(KEY_TOKEN_TYPE, "").orEmpty()
+    }
+
+    override fun getLastLoggedIn(): String? {
+        return preferences.getString(KEY_LAST_LOGIN, "").orEmpty()
     }
 
     override fun deleteTokenInfo() {
