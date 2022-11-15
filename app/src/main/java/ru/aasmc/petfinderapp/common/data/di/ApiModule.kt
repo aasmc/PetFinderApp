@@ -49,6 +49,8 @@ object ApiModule {
             .addInterceptor(networkStatusInterceptor)
             .addInterceptor(authenticationInterceptor)
             .addInterceptor(httpLoggingInterceptor)
+            // disable in-memory cache, which is used by the OkHttp
+            .cache(null)
             .build()
     }
 

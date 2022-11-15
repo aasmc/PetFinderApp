@@ -77,6 +77,16 @@ class ReportDetailFragment : Fragment() {
         setupUI()
     }
 
+    override fun onPause() {
+        clearCaches()
+        super.onPause()
+    }
+
+    private fun clearCaches() {
+        context?.cacheDir?.deleteRecursively()
+        context?.externalCacheDir?.deleteRecursively()
+    }
+
     private fun setupUI() {
         binding.detailsEdtxtview.imeOptions = EditorInfo.IME_ACTION_DONE
         binding.detailsEdtxtview.setRawInputType(InputType.TYPE_CLASS_TEXT)

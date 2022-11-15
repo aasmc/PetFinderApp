@@ -6,6 +6,7 @@ import android.graphics.Rect
 import android.widget.ImageView
 import androidx.lifecycle.viewModelScope
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -16,6 +17,8 @@ import ru.aasmc.petfinderapp.logging.Logger
 fun ImageView.setImage(url: String) {
     Glide.with(this.context)
         .load(url.ifEmpty { null })
+        // disable caching
+        .diskCacheStrategy(DiskCacheStrategy.NONE)
         .error(R.drawable.dog_placeholder)
         .centerCrop()
         .transition(DrawableTransitionOptions.withCrossFade())
