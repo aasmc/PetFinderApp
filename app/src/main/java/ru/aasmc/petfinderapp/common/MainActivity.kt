@@ -2,6 +2,7 @@ package ru.aasmc.petfinderapp.common
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Base64
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -9,6 +10,10 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
+import androidx.biometric.BiometricPrompt
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
@@ -24,10 +29,14 @@ import ru.aasmc.petfinderapp.common.data.preferences.Preferences
 import ru.aasmc.petfinderapp.common.domain.model.user.User
 import ru.aasmc.petfinderapp.common.domain.repositories.UserRepository
 import ru.aasmc.petfinderapp.common.utils.DATA_SOURCE_FILE_NAME
+import ru.aasmc.petfinderapp.common.utils.Encryption.Companion.createLoginPassword
+import ru.aasmc.petfinderapp.common.utils.Encryption.Companion.decryptPassword
+import ru.aasmc.petfinderapp.common.utils.Encryption.Companion.generateSecretKey
 import ru.aasmc.petfinderapp.databinding.ActivityMainBinding
 import java.io.File
 import java.io.FileInputStream
 import java.io.ObjectInputStream
+import java.util.concurrent.Executors
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -48,6 +57,9 @@ class MainActivity : AppCompatActivity() {
     private val viewModel: AnimalsNearYouFragmentViewModel by viewModels()
     private var isSignedUp = false
     private var workingFile: File? = null
+
+    private lateinit var biometricPrompt: BiometricPrompt
+    private lateinit var promptInfo: BiometricPrompt.PromptInfo
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Switch to AppTheme for displaying the activity
@@ -120,7 +132,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun loginPressed(view: View) {
-        displayLogin(view, false)
+        val biometricManager = BiometricManager.from(this)
+        when(biometricManager.canAuthenticate(BIOMETRIC_STRONG)) {
+            BiometricManager.BIOMETRIC_SUCCESS -> {
+                displayLogin(view, false)
+            }
+            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
+                displayLogin(view, true)
+            }
+            BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
+                toast("Biometric features are currently unavailable")
+            }
+            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
+                toast("Please associate a biometric credential with your account.")
+            }
+            else -> {
+                toast("An unknown error occurred. Please check your Biometric settings.")
+            }
+        }
     }
 
     private fun updateLoggedInState() {
@@ -135,8 +164,56 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun displayLogin(view: View, fallback: Boolean) {
-        // replace below
-        performLoginOperation(view)
+        val executor = Executors.newSingleThreadExecutor()
+        biometricPrompt = BiometricPrompt(this, executor,
+        object: BiometricPrompt.AuthenticationCallback() {
+            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                super.onAuthenticationError(errorCode, errString)
+                runOnUiThread {
+                    toast("Authentication error: $errString")
+                }
+            }
+
+            override fun onAuthenticationFailed() {
+                super.onAuthenticationFailed()
+                runOnUiThread {
+                    toast("Authentication failed")
+                }
+            }
+
+            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                super.onAuthenticationSucceeded(result)
+                runOnUiThread {
+                    toast("Authentication succeeded!")
+                    if (!isSignedUp) {
+
+                        // create a secret key that's tied to the authentication for first
+                        // time users.
+                        generateSecretKey()
+                    }
+                    performLoginOperation(view)
+                }
+            }
+        })
+
+        if (fallback) {
+            promptInfo = BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Biometric login for my app")
+                .setSubtitle("Log in using your biometric credential")
+                // Cannot call setNegativeButtonText() and
+                // setDeviceCredentialAllowed() at the same time.
+                // .setNegativeButtonText("Use account password")
+                .setAllowedAuthenticators(DEVICE_CREDENTIAL)
+                .build()
+        } else {
+            promptInfo = BiometricPrompt.PromptInfo.Builder()
+                .setTitle("Biometric login for my app")
+                .setSubtitle("Log in using your biometric credential")
+                .setNegativeButtonText("Use account password")
+                .build()
+        }
+
+        biometricPrompt.authenticate(promptInfo)
     }
 
     private fun performLoginOperation(view: View) {
@@ -151,8 +228,13 @@ class MainActivity : AppCompatActivity() {
                 val list = objectInputStream.readObject() as ArrayList<User>
                 val firstUser = list.first() as? User
                 if (firstUser is User) { // 2
-                    // replace below with implementation that decrypts password
-                    success = true
+                    val password = decryptPassword(
+                        this, Base64.decode(firstUser.password, Base64.NO_WRAP)
+                    )
+                    if (password.isNotEmpty()) {
+                        //Send password to authenticate with server etc
+                        success = true
+                    }
                 }
 
                 if (success) {
@@ -164,8 +246,8 @@ class MainActivity : AppCompatActivity() {
                 objectInputStream.close()
                 fileInputStream.close()
             } else {
-                // replace with encrypted data source below
-                UserRepository.createDataSource(applicationContext, it, ByteArray(0))
+                val encryptedInfo = createLoginPassword(this)
+                UserRepository.createDataSource(applicationContext, it, encryptedInfo)
                 success = true
             }
         }

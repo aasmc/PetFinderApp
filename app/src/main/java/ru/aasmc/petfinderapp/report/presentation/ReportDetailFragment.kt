@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.InputType
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,8 +17,12 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import ru.aasmc.petfinderapp.common.utils.Encryption
+import ru.aasmc.petfinderapp.common.utils.Encryption.Companion.encryptFile
 import ru.aasmc.petfinderapp.databinding.FragmentReportDetailBinding
 import java.io.File
+import java.io.FileOutputStream
+import java.io.ObjectOutputStream
 import java.io.RandomAccessFile
 import java.net.URL
 import java.util.*
@@ -104,14 +109,13 @@ class ReportDetailFragment : Fragment() {
             val reportID = UUID.randomUUID().toString()
 
             context?.let { theContext ->
-                //TODO: Replace below for encrypting the file
                 val file = File(theContext.filesDir?.absolutePath, "$reportID.txt")
-                file.bufferedWriter().use {
+                val encryptedFile = encryptFile(theContext, file)
+                encryptedFile.openFileOutput().bufferedWriter().use {
                     it.write(reportString)
                 }
             }
-            //TODO: Test your custom encryption here
-            //testCustomEncryption(reportString)
+            testCustomEncryption(reportString)
 
             ReportTracker.reportNumber.incrementAndGet()
 
@@ -145,7 +149,21 @@ class ReportDetailFragment : Fragment() {
     }
 
     private fun testCustomEncryption(reportString: String) {
+        val password = REPORT_SESSION_KEY.toCharArray()
+        val bytes = reportString.toByteArray(Charsets.UTF_8)
+        val map = Encryption.encrypt(bytes, password)
+        val reportID = UUID.randomUUID().toString()
+        val outFile = File(activity?.filesDir?.absolutePath, "$reportID.txt")
+        ObjectOutputStream(FileOutputStream(outFile)).use {
+            it.writeObject(map)
+        }
 
+        // TEST decrypt
+        val decryptedBytes = Encryption.decrypt(map, password)
+        decryptedBytes?.let {
+            val decryptedString = String(it, Charsets.UTF_8)
+            Log.e("Encryption Test", " The decrypted string is: $decryptedString")
+        }
     }
 
 
@@ -172,8 +190,10 @@ class ReportDetailFragment : Fragment() {
             val isValid = isValidJPEGAtPath(selectedImage)
             if (isValid) {
                 val fileNameColumn = arrayOf(MediaStore.Images.Media.DISPLAY_NAME)
-                val nameCursor = activity?.contentResolver?.query(selectedImage, fileNameColumn,
-                null, null, null)
+                val nameCursor = activity?.contentResolver?.query(
+                    selectedImage, fileNameColumn,
+                    null, null, null
+                )
                 nameCursor?.moveToFirst()
                 val nameIndex = nameCursor?.getColumnIndex(fileNameColumn[0])
                 var filename = ""
@@ -183,7 +203,11 @@ class ReportDetailFragment : Fragment() {
 
                 binding.uploadStatusTextview.text = filename
             } else {
-                val toast = Toast.makeText(context, "Please choose a JPEG image", Toast.LENGTH_LONG)
+                val toast = Toast.makeText(
+                    context,
+                    "Please choose a JPEG image",
+                    Toast.LENGTH_LONG
+                )
                 toast.show()
             }
         }
