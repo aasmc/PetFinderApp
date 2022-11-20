@@ -14,7 +14,6 @@ import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import androidx.biometric.BiometricPrompt
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -24,6 +23,8 @@ import androidx.navigation.ui.setupWithNavController
 import dagger.hilt.android.AndroidEntryPoint
 import ru.aasmc.petfinderapp.R
 import ru.aasmc.petfinderapp.animalsnearyou.presentation.AnimalsNearYouFragmentViewModel
+import ru.aasmc.petfinderapp.common.data.api.Authenticator
+import ru.aasmc.petfinderapp.common.data.api.ReportManager
 import ru.aasmc.petfinderapp.common.data.preferences.PetSavePreferences
 import ru.aasmc.petfinderapp.common.data.preferences.Preferences
 import ru.aasmc.petfinderapp.common.domain.model.user.User
@@ -60,6 +61,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var biometricPrompt: BiometricPrompt
     private lateinit var promptInfo: BiometricPrompt.PromptInfo
+
+    val clientAuthenticator = Authenticator()
+    var serverPublicKeyString = ""
+    val reportManager = ReportManager()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         // Switch to AppTheme for displaying the activity
@@ -133,7 +138,7 @@ class MainActivity : AppCompatActivity() {
 
     fun loginPressed(view: View) {
         val biometricManager = BiometricManager.from(this)
-        when(biometricManager.canAuthenticate(BIOMETRIC_STRONG)) {
+        when (biometricManager.canAuthenticate(BIOMETRIC_STRONG)) {
             BiometricManager.BIOMETRIC_SUCCESS -> {
                 displayLogin(view, false)
             }
@@ -166,35 +171,44 @@ class MainActivity : AppCompatActivity() {
     private fun displayLogin(view: View, fallback: Boolean) {
         val executor = Executors.newSingleThreadExecutor()
         biometricPrompt = BiometricPrompt(this, executor,
-        object: BiometricPrompt.AuthenticationCallback() {
-            override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
-                super.onAuthenticationError(errorCode, errString)
-                runOnUiThread {
-                    toast("Authentication error: $errString")
-                }
-            }
+                                          object :
+                                              BiometricPrompt.AuthenticationCallback() {
+                                              override fun onAuthenticationError(
+                                                  errorCode: Int,
+                                                  errString: CharSequence
+                                              ) {
+                                                  super.onAuthenticationError(
+                                                      errorCode,
+                                                      errString
+                                                  )
+                                                  runOnUiThread {
+                                                      toast("Authentication error: $errString")
+                                                  }
+                                              }
 
-            override fun onAuthenticationFailed() {
-                super.onAuthenticationFailed()
-                runOnUiThread {
-                    toast("Authentication failed")
-                }
-            }
+                                              override fun onAuthenticationFailed() {
+                                                  super.onAuthenticationFailed()
+                                                  runOnUiThread {
+                                                      toast("Authentication failed")
+                                                  }
+                                              }
 
-            override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                super.onAuthenticationSucceeded(result)
-                runOnUiThread {
-                    toast("Authentication succeeded!")
-                    if (!isSignedUp) {
+                                              override fun onAuthenticationSucceeded(
+                                                  result: BiometricPrompt.AuthenticationResult
+                                              ) {
+                                                  super.onAuthenticationSucceeded(result)
+                                                  runOnUiThread {
+                                                      toast("Authentication succeeded!")
+                                                      if (!isSignedUp) {
 
-                        // create a secret key that's tied to the authentication for first
-                        // time users.
-                        generateSecretKey()
-                    }
-                    performLoginOperation(view)
-                }
-            }
-        })
+                                                          // create a secret key that's tied to the authentication for first
+                                                          // time users.
+                                                          generateSecretKey()
+                                                      }
+                                                      performLoginOperation(view)
+                                                  }
+                                              }
+                                          })
 
         if (fallback) {
             promptInfo = BiometricPrompt.PromptInfo.Builder()
@@ -228,11 +242,15 @@ class MainActivity : AppCompatActivity() {
                 val list = objectInputStream.readObject() as ArrayList<User>
                 val firstUser = list.first() as? User
                 if (firstUser is User) { // 2
-                    val password = decryptPassword(
+                    val userToken = decryptPassword(
                         this, Base64.decode(firstUser.password, Base64.NO_WRAP)
                     )
-                    if (password.isNotEmpty()) {
+                    if (userToken.isNotEmpty()) {
                         //Send password to authenticate with server etc
+                        serverPublicKeyString = reportManager.login(
+                            Base64.encodeToString(userToken, Base64.NO_WRAP),
+                            clientAuthenticator.publicKey()
+                        )
                         success = true
                     }
                 }
@@ -274,6 +292,12 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
+    }
+
+    override fun onPause() {
+        super.onPause()
+        cacheDir.deleteRecursively()
+        externalCacheDir?.deleteRecursively()
     }
 
     private fun toast(message: String) {

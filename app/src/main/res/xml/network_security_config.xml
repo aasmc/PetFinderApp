@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">petfinder.com</domain>
+        <pin-set>
+            <pin digest="SHA-256">JOKuxI6G3nQJb9wHWcXFZkQR1sEOAPMebWnQ+5AI4/I=</pin>
+            <pin digest="SHA-256">JSMzqOOrtyOT1kmau6zKhgT676hGgczD5VMdRMyJZFA=</pin>
+        </pin-set>
+    </domain-config>
+</network-security-config>

@@ -211,3 +211,57 @@ Example of decryption:
             return decrypted
         }
 ```
+
+**Perfect Forward Secrecy**
+It generates a unique session key for each communication session. If an attacker compromises the key
+for a specific session, it won't affect data from other sessions. Android 5.0+ implements PFS by 
+default. 
+
+**Certificate pinning**.
+It prevents connections by checking the server's certificate against a copy of the expected 
+certificate. Instead of comparing the entire certificate, it compares the hash of the public key,
+often called a pin.
+
+**OCSP Stapling**
+The traditional way to determine if an entity revoked a certificate is to check a Certificate
+Revocation List (CRL). To do this, your app must contact a third party to confirm the validity of the
+certificate, which adds network overhead. It also leaks private information about the sites
+you want to connect with to the third party.
+
+Online Certificate Status Protocol (OCSP) stapling comes to the rescue. When you start an HTTPS 
+request to the server using this method, the validity of the server's certificate is already 
+stapled to the response. OCSP stapling is enabled by default, but you can disable it or customize
+the behaviour of certificate revocation using PKIXRevocationChecker.Option. 
+
+```kotlin
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+          val ts = KeyStore.getInstance("AndroidKeyStore")
+          ts.load(null)
+          val kmf =  KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+          val tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+          // init cert path checking for offered certs and revocation checks against CLRs
+          val cpb = CertPathBuilder.getInstance("PKIX")
+          val rc: PKIXRevocationChecker = cpb.revocationChecker as PKIXRevocationChecker
+          rc.options = (EnumSet.of(
+              PKIXRevocationChecker.Option.PREFER_CRLS, // use CLR over OCSP
+              PKIXRevocationChecker.Option.ONLY_END_ENTITY,
+              PKIXRevocationChecker.Option.NO_FALLBACK)) // no fall back to OCSP
+          val pkixParams = PKIXBuilderParameters(ts, X509CertSelector())
+          pkixParams.addCertPathChecker(rc)
+          tmf.init( CertPathTrustManagerParameters(pkixParams) )
+          val ctx = SSLContext.getInstance("TLS")
+          ctx.init(kmf.keyManagers, tmf.trustManagers, null)
+        }
+```
+
+**Digital signatures** ensure that you're the one accessing your health data, starting chat or logging
+into a bank. They also ensure no one has altered the data. 
+
+At the heart of a digital signature is a hash function - it takes a variable amount of data
+and outputs a signature of a fixed length. It's a one-way function, also known in math as a 
+trap-door function. Given the resulting output, there's no computationally-feasible way 
+to reverse it to reveal what the original input was. To authenticate that data is untampered, 
+a Secure Hash Algorithm (SHA) is used. 
+
+The app uses Elliptic-Curve Cryptography to verify integrity of data.
+Elliptic Curve Digital Signature Algorithm (ECDSA). 

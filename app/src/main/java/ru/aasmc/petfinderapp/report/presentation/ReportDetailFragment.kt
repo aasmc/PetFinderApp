@@ -7,7 +7,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.text.InputType
+import android.util.Base64
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +19,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import ru.aasmc.petfinderapp.common.MainActivity
 import ru.aasmc.petfinderapp.common.utils.Encryption
 import ru.aasmc.petfinderapp.common.utils.Encryption.Companion.encryptFile
 import ru.aasmc.petfinderapp.databinding.FragmentReportDetailBinding
@@ -33,8 +36,8 @@ class ReportDetailFragment : Fragment() {
 
     companion object {
         private const val API_URL = "https://example.com/?send_report"
-        private const val REPORT_APP_ID = 46341L
-        private const val REPORT_PROVIDER_ID = 46341L
+        private const val REPORT_APP_ID = 46341
+        private const val REPORT_PROVIDER_ID = 46341
         private const val REPORT_SESSION_KEY = "session_key_in_next_chapter"
     }
 
@@ -101,6 +104,7 @@ class ReportDetailFragment : Fragment() {
     private fun sendReportPressed() {
         if (!isSendingReport) {
             isSendingReport = true
+            var success = false
 
             // 1. Save report
             var reportString = binding.categoryEdtxtview.text.toString()
@@ -120,18 +124,48 @@ class ReportDetailFragment : Fragment() {
             ReportTracker.reportNumber.incrementAndGet()
 
             // 2. Send report
+            val mainActivity = activity as MainActivity
+            var requestSignature = ""
+            // TODO add signature here
+            val stringToSign = "$REPORT_APP_ID+$reportID+$reportString"
+            val bytesToSign = stringToSign.toByteArray(Charsets.UTF_8)
+            val signedData = mainActivity.clientAuthenticator.sign(bytesToSign)
+            requestSignature = Base64.encodeToString(signedData, Base64.NO_WRAP)
             val postParameters = mapOf(
-                "application_id" to REPORT_APP_ID * REPORT_PROVIDER_ID,
+                "application_id" to REPORT_APP_ID,
                 "report_id" to reportID,
-                "report" to reportString
+                "report" to reportString,
+                "signature" to requestSignature
             )
             if (postParameters.isNotEmpty()) {
                 // send
-                val connection = URL(API_URL).openConnection() as HttpsURLConnection
-                // ...
-            }
+                mainActivity.reportManager.sendReport(postParameters) {
+                    val reportSent: Boolean = it["success"] as Boolean
+                    if (reportSent) {
+                        // verity signature
+                        val serverSignature = it["signature"] as String
+                        val signatureBytes =
+                            Base64.decode(serverSignature, Base64.NO_WRAP)
 
-            isSendingReport = false
+                        val confirmationCode = it["confirmation_code"] as String
+                        val confirmationBytes =
+                            confirmationCode.toByteArray(Charsets.UTF_8)
+
+                        success = mainActivity.clientAuthenticator.verify(
+                            signatureBytes,
+                            confirmationBytes,
+                            mainActivity.serverPublicKeyString
+                        )
+                    }
+                    onReportReceived(success)
+                }
+            }
+        }
+    }
+
+    private fun onReportReceived(success: Boolean) {
+        isSendingReport = false
+        if (success) {
             context?.let {
                 val report = "Report: ${ReportTracker.reportNumber.get()}"
                 val toast =
@@ -142,10 +176,17 @@ class ReportDetailFragment : Fragment() {
                     )
                 toast.show()
             }
-            val imm =
-                activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-            imm.hideSoftInputFromWindow(view?.windowToken, 0)
+        } else {
+            val toast = Toast.makeText(
+                context, "There was a problem sending the report.", Toast
+                    .LENGTH_LONG
+            )
+            toast.setGravity(Gravity.TOP, 0, 0)
+            toast.show()
         }
+        val imm =
+            activity?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view?.windowToken, 0)
     }
 
     private fun testCustomEncryption(reportString: String) {
