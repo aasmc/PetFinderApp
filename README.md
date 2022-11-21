@@ -265,3 +265,12 @@ a Secure Hash Algorithm (SHA) is used.
 
 The app uses Elliptic-Curve Cryptography to verify integrity of data.
 Elliptic Curve Digital Signature Algorithm (ECDSA). 
+
+### App Hardening tips:
+- avoid code vulnerabilities
+- validate input and sanitize output
+  - prevent SQL Injection attacks by stripping input fields of illegal characters like (\, ;, %, " ' *, etc.)
+  - dots and slashes may be harmful if they're passed to file management code. (e.g ../)
+  - while interacting with C code, take into account C-style strings that require NULL terminating byte
+  - etc.
+- perform integrity checking

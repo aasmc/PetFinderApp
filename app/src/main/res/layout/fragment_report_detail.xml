@@ -51,6 +51,7 @@
         android:autofillHints="@string/category"
         android:hint="@string/category"
         android:inputType="textNoSuggestions|textVisiblePassword|textFilter"
+        android:maxLength="32"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
         android:textSize="18sp" />

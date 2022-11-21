@@ -30,6 +30,7 @@ import ru.aasmc.petfinderapp.common.data.preferences.Preferences
 import ru.aasmc.petfinderapp.common.domain.model.user.User
 import ru.aasmc.petfinderapp.common.domain.repositories.UserRepository
 import ru.aasmc.petfinderapp.common.utils.DATA_SOURCE_FILE_NAME
+import ru.aasmc.petfinderapp.common.utils.DataValidator
 import ru.aasmc.petfinderapp.common.utils.Encryption.Companion.createLoginPassword
 import ru.aasmc.petfinderapp.common.utils.Encryption.Companion.decryptPassword
 import ru.aasmc.petfinderapp.common.utils.Encryption.Companion.generateSecretKey
@@ -137,22 +138,31 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun loginPressed(view: View) {
-        val biometricManager = BiometricManager.from(this)
-        when (biometricManager.canAuthenticate(BIOMETRIC_STRONG)) {
-            BiometricManager.BIOMETRIC_SUCCESS -> {
-                displayLogin(view, false)
-            }
-            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
-                displayLogin(view, true)
-            }
-            BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
-                toast("Biometric features are currently unavailable")
-            }
-            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
-                toast("Please associate a biometric credential with your account.")
-            }
-            else -> {
-                toast("An unknown error occurred. Please check your Biometric settings.")
+        var success = false
+        val email = binding.loginEmail.text.toString()
+        if (isSignedUp || DataValidator.isValidEmailString(email)) {
+            success = true
+        } else {
+            toast("Please enter a valid email.")
+        }
+        if (success) {
+            val biometricManager = BiometricManager.from(this)
+            when (biometricManager.canAuthenticate(BIOMETRIC_STRONG)) {
+                BiometricManager.BIOMETRIC_SUCCESS -> {
+                    displayLogin(view, false)
+                }
+                BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
+                    displayLogin(view, true)
+                }
+                BiometricManager.BIOMETRIC_ERROR_HW_UNAVAILABLE -> {
+                    toast("Biometric features are currently unavailable")
+                }
+                BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
+                    toast("Please associate a biometric credential with your account.")
+                }
+                else -> {
+                    toast("An unknown error occurred. Please check your Biometric settings.")
+                }
             }
         }
     }

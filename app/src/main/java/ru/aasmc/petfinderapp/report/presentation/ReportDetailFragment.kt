@@ -20,6 +20,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import ru.aasmc.petfinderapp.common.MainActivity
+import ru.aasmc.petfinderapp.common.utils.DataValidator
 import ru.aasmc.petfinderapp.common.utils.Encryption
 import ru.aasmc.petfinderapp.common.utils.Encryption.Companion.encryptFile
 import ru.aasmc.petfinderapp.databinding.FragmentReportDetailBinding
@@ -110,6 +111,13 @@ class ReportDetailFragment : Fragment() {
             var reportString = binding.categoryEdtxtview.text.toString()
             reportString += " : "
             reportString += binding.detailsEdtxtview.text.toString()
+
+            reportString = reportString.replace("\\", "")
+                .replace(";", "")
+                .replace("%", "")
+                .replace("\"", "")
+                .replace("\'", "")
+
             val reportID = UUID.randomUUID().toString()
 
             context?.let { theContext ->
@@ -121,7 +129,9 @@ class ReportDetailFragment : Fragment() {
             }
             testCustomEncryption(reportString)
 
-            ReportTracker.reportNumber.incrementAndGet()
+            synchronized(this) {
+                ReportTracker.reportNumber.incrementAndGet()
+            }
 
             // 2. Send report
             val mainActivity = activity as MainActivity
@@ -167,7 +177,10 @@ class ReportDetailFragment : Fragment() {
         isSendingReport = false
         if (success) {
             context?.let {
-                val report = "Report: ${ReportTracker.reportNumber.get()}"
+                val report: String
+                synchronized(this) {
+                    report = "Report: ${ReportTracker.reportNumber.get()}"
+                }
                 val toast =
                     Toast.makeText(
                         it,
@@ -254,6 +267,10 @@ class ReportDetailFragment : Fragment() {
         }
     }
 
+    /**
+     * For the JPEG format, the first two bytes and the last two bytes of a valid
+     * image are always FF D8 and FF D9.
+     */
     private fun isValidJPEGAtPath(selectedImage: Uri): Boolean {
         var success = false
         val file = File(context?.cacheDir, "temp.jpg")
