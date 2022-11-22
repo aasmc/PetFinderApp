@@ -62,6 +62,7 @@ class AnimalDetailsFragment : Fragment() {
             stiffness = STIFFNESS_VERY_LOW
         }
     }
+    private val FLING_FRICTION = 2f
 
     /**
      * Create a SpringAnimation for scaleX property.
@@ -81,7 +82,6 @@ class AnimalDetailsFragment : Fragment() {
         }
     }
 
-    private val FLING_FRICTION = 2f
 
     private val callFlingXAnimation: FlingAnimation by lazy {
         FlingAnimation(binding.call, DynamicAnimation.X).apply {
@@ -146,6 +146,43 @@ class AnimalDetailsFragment : Fragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun displayPetDetails(animalDetails: UIAnimalDetailed, adopted: Boolean) {
+
+        /**
+         * Create a SpringAnimation for scaleX property.
+         */
+        val callScaleXSpringAnimation: SpringAnimation by lazy {
+            SpringAnimation(binding.call, DynamicAnimation.SCALE_X).apply {
+                spring = springForce
+            }
+        }
+
+        /**
+         * Create a SpringAnimation for scaleY property.
+         */
+        val callScaleYSpringAnimation: SpringAnimation by lazy {
+            SpringAnimation(binding.call, DynamicAnimation.SCALE_Y).apply {
+                spring = springForce
+            }
+        }
+
+
+        val callFlingXAnimation: FlingAnimation by lazy {
+            FlingAnimation(binding.call, DynamicAnimation.X).apply {
+                friction = FLING_FRICTION
+                setMinValue(0f)
+                setMaxValue(binding.root.width.toFloat() - binding.call.width.toFloat())
+            }
+        }
+
+        val callFlingYAnimation: FlingAnimation by lazy {
+            FlingAnimation(binding.call, DynamicAnimation.Y).apply {
+                // the greater the friction is, the sooner the animation will slow down
+                // 2.0f means, that it takes a bit of effort to fling the button onto the image
+                friction = FLING_FRICTION
+                setMinValue(0f)
+                setMaxValue(binding.root.height.toFloat() - binding.call.width.toFloat())
+            }
+        }
         binding.call.scaleX = 0.6f
         binding.call.scaleY = 0.6f
         binding.call.isVisible = true
